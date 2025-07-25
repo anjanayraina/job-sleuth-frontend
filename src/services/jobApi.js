@@ -1,11 +1,24 @@
 // src/services/jobApi.js
-export async function fetchJobs({ search = "" } = {}) {
-  const params = new URLSearchParams();
-  if (search) params.append("search", search);
+import { JobSearchRequest } from "./JobSearchRequest";
 
-  // NOTE: For development, you might need to change the API base URL.
-  // If your backend runs at http://localhost:8000, update the fetch URL.
+export async function fetchJobs(jobSearchRequest = new JobSearchRequest()) {
+  const params = new URLSearchParams();
+  if (jobSearchRequest.search) params.append("search", jobSearchRequest.search);
+  if (jobSearchRequest.location) params.append("location", jobSearchRequest.location);
+  if (jobSearchRequest.company) params.append("company", jobSearchRequest.company);
+  if (jobSearchRequest.jobType) params.append("jobType", jobSearchRequest.jobType);
+  if (jobSearchRequest.minSalary) params.append("minSalary", jobSearchRequest.minSalary);
+  if (jobSearchRequest.maxSalary) params.append("maxSalary", jobSearchRequest.maxSalary);
+  if (jobSearchRequest.tags && jobSearchRequest.tags.length > 0) {
+    jobSearchRequest.tags.forEach(tag => params.append("tags", tag));
+  }
+
   const res = await fetch(`/api/jobs?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to fetch jobs");
+  return await res.json();
+}
+export async function fetchJobById(id) {
+  const res = await fetch(`/api/jobs/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch job details");
   return await res.json();
 }
