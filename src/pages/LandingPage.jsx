@@ -1,80 +1,85 @@
 import React from "react";
-import { Box, Container, Grid, Typography, Button } from "@mui/material";
-import JobCard from "../components/JobCard";
+import "../style.css";
 
 const jobs = [
   {
-    title: "Solidity Developer",
-    company: "Uniswap",
+    title: "Senior Solidity Engineer",
+    company: "BlockChain Co.",
     platform: "Telegram",
-    channel: "@uniswap_jobs",
-    time: "2h ago",
-    tags: ["Solidity", "Remote", "DeFi"],
-    link: "https://t.me/uniswap_jobs/123"
+    image: "https://source.unsplash.com/random/300x300?blockchain",
   },
   {
-    title: "UI/UX Designer",
-    company: "Meta DAO",
+    title: "Frontend Developer",
+    company: "WebCrafters Inc.",
     platform: "Discord",
-    channel: "#meta-jobs",
-    time: "4h ago",
-    tags: ["Design", "Remote", "Web3"],
-    link: "https://discord.com/channels/..."
+    image: "https://source.unsplash.com/random/300x300?frontend",
   },
   {
-    title: "Fullstack Engineer",
-    company: "NFT Market",
+    title: "Product Manager",
+    company: "Innovate Solutions",
     platform: "Telegram",
-    channel: "@nftmarket_jobs",
-    time: "6h ago",
-    tags: ["Node.js", "Frontend", "Remote"],
-    link: "https://t.me/nftmarket_jobs/987"
-  }
+    image: "https://source.unsplash.com/random/300x300?product",
+  },
+  {
+    title: "Data Scientist",
+    company: "Data Insights Corp.",
+    platform: "Discord",
+    image: "https://source.unsplash.com/random/300x300?data",
+  },
+  {
+    title: "UX Designer",
+    company: "User Experience Studio",
+    platform: "Telegram",
+    image: "https://source.unsplash.com/random/300x300?ux",
+  },
+  {
+    title: "DevOps Engineer",
+    company: "CloudOps Ltd.",
+    platform: "Discord",
+    image: "https://source.unsplash.com/random/300x300?devops",
+  },
 ];
 
-export default function LandingPage() {
+const LandingPage = () => {
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)" }}>
-      {/* Hero Section */}
-      <Box sx={{ py: 8, bgcolor: "white", textAlign: "center", boxShadow: 2 }}>
-        <Typography variant="h2" component="h1" fontWeight={900} color="primary" gutterBottom>
-          Discover Hidden Jobs on Telegram & Discord
-        </Typography>
-        <Typography variant="h5" color="text.secondary" mb={3}>
-          The fastest way to find exclusive jobs shared in chat groups. Search, filter, and apply in seconds!
-        </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          color="secondary"
-          sx={{ px: 5, py: 1.5, fontWeight: "bold", fontSize: "1.2rem" }}
-        >
-          Browse Live Jobs
-        </Button>
-      </Box>
+    <div className="container">
+      <header className="header">
+        <div className="logo">JobSleuth</div>
+        <nav>
+          <a href="#">Home</a>
+          <a href="#">About</a>
+          <a href="#">Contact</a>
+        </nav>
+        <button className="browse-btn">Browse Jobs</button>
+      </header>
 
-      {/* Jobs Grid */}
-      <Container sx={{ mt: 8, mb: 10 }}>
-        <Typography variant="h4" color="primary" fontWeight={700} mb={4} align="center">
-          Latest Jobs Feed
-        </Typography>
-        <Grid container spacing={4} justifyContent="center">
+      <section className="hero">
+        <h1>Find Hidden Jobs from Telegram & Discord</h1>
+        <p>The fastest way to discover exclusive jobs shared in fast-moving chat groups.</p>
+        <button className="cta-btn">Browse Live Jobs</button>
+      </section>
+
+      <section className="latest-jobs">
+        <h2>Latest Jobs</h2>
+        <div className="jobs-grid">
           {jobs.map((job, idx) => (
-            <Grid item xs={12} sm={6} md={4} key={idx}>
-              <JobCard
-                {...job}
-                onView={() => window.open(job.link, "_blank")}
-              />
-            </Grid>
+            <div key={idx} className="job-card">
+              <img src={job.image} alt={job.title} />
+              <div>
+                <h3>{job.title}</h3>
+                <p>{job.company}</p>
+                <span className={`platform ${job.platform.toLowerCase()}`}>{job.platform}</span>
+              </div>
+            </div>
           ))}
-        </Grid>
-      </Container>
-      {/* Footer */}
-      <Box sx={{ py: 5, bgcolor: "#f4f4f5", textAlign: "center" }}>
-        <Typography variant="body2" color="text.secondary">
-          © {new Date().getFullYear()} JobSleuth · Made with 💙 for builders
-        </Typography>
-      </Box>
-    </Box>
+        </div>
+      </section>
+
+      <footer className="footer">
+        © 2024 JobSleuth. All rights reserved.
+      </footer>
+    </div>
   );
-}
+};
+
+export default LandingPage;

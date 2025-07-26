@@ -6,8 +6,6 @@ import './pages/LandingPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
 <LandingPage/>
