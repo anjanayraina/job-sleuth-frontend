@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { Link as RouterLink } from 'react-router-dom';
 import JobCard from "../../components/JobCard";
-import { Container, Grid, TextField, Typography, Box } from "@mui/material";
+import { Container, Grid, TextField, Typography, Box, AppBar, Toolbar, Button } from "@mui/material";
+import { WorkOutline } from '@mui/icons-material';
 
-// We've replaced the API call with this local mock data array.
+// Mock data remains the same...
 const mockJobs = [
     {
         id: "1",
@@ -63,20 +65,33 @@ const mockJobs = [
 export default function JobList() {
     const [search, setSearch] = useState("");
 
-    // The search logic now filters our local mockJobs array directly.
     const filteredJobs = mockJobs.filter(job =>
         job.title.toLowerCase().includes(search.toLowerCase()) ||
         job.company.toLowerCase().includes(search.toLowerCase()) ||
         job.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
     );
 
-    // A simple function to handle opening the job link.
     const handleViewJob = (url) => {
         window.open(url, "_blank", "noopener,noreferrer");
     };
 
     return (
         <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
+            {/* Header */}
+            <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
+                <Toolbar>
+                    <WorkOutline sx={{ mr: 1.5 }} />
+                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                        JobSleuth
+                    </Typography>
+                    <Box>
+                        <Button color="inherit" component={RouterLink} to="/">Home</Button>
+                        <Button color="inherit" component={RouterLink} to="/about">About</Button>
+                        <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <Box sx={{ mb: 4, textAlign: 'center' }}>
                     <Typography variant="h3" fontWeight="bold" gutterBottom>
@@ -110,8 +125,8 @@ export default function JobList() {
                                     title={job.title}
                                     company={job.company}
                                     platform={job.platform}
-                                    channel={job.location} // Using location as channel
-                                    time={"Posted recently"} // Placeholder
+                                    channel={job.location}
+                                    time={"Posted recently"}
                                     tags={job.tags}
                                     onView={() => handleViewJob(job.url)}
                                 />
