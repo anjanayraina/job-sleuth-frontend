@@ -1,8 +1,9 @@
 import React from "react";
+import { Link as RouterLink } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardMedia, CardContent, Box } from "@mui/material";
 import { WorkOutline } from "@mui/icons-material";
 
-// Mock data, same as before. We'll replace this with a real API call later.
+// Mock data, same as before.
 const jobs = [
   {
     title: "Senior Solidity Engineer",
@@ -53,7 +54,7 @@ const LandingPage = () => {
               JobSleuth
             </Typography>
             <Box>
-              <Button color="inherit">Home</Button>
+              <Button color="inherit" component={RouterLink} to="/">Home</Button>
               <Button color="inherit">About</Button>
               <Button color="inherit">Contact</Button>
             </Box>
@@ -79,16 +80,22 @@ const LandingPage = () => {
             <Typography variant="h6" component="p" sx={{ mb: 3, color: 'grey.200' }}>
               The fastest way to discover exclusive jobs shared in fast-moving chat groups.
             </Typography>
-            <Button variant="contained" size="large" color="primary" sx={{
-              fontWeight: 'bold',
-              py: 1.5,
-              px: 4,
-              backgroundColor: 'white',
-              color: '#2196F3',
-              '&:hover': {
-                backgroundColor: 'grey.100',
-              }
-            }}>
+            <Button
+                variant="contained"
+                size="large"
+                component={RouterLink}
+                to="/jobs"
+                sx={{
+                  fontWeight: 'bold',
+                  py: 1.5,
+                  px: 4,
+                  backgroundColor: 'white',
+                  color: '#2196F3',
+                  '&:hover': {
+                    backgroundColor: 'grey.100',
+                  }
+                }}
+            >
               Browse Live Jobs
             </Button>
           </Box>

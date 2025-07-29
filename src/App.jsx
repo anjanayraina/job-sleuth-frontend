@@ -1,16 +1,17 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import './pages/LandingPage.jsx'
-import LandingPage from './pages/LandingPage.jsx'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage.jsx';
+import JobList from './features/jobs/JobList.jsx';
+import './App.css';
 
 function App() {
-  return (
-    <>
-<LandingPage/>
-    </>
-  )
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/jobs" element={<JobList />} />
+            </Routes>
+        </Router>
+    );
 }
 
-export default App
+export default App;
