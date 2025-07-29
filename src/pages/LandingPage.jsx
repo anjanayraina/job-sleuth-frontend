@@ -55,14 +55,12 @@ const LandingPage = () => {
                     </Typography>
                     <Box>
                         <Button color="inherit" component={RouterLink} to="/">Home</Button>
-                        {/* This button now links to the about page */}
                         <Button color="inherit" component={RouterLink} to="/about">About</Button>
-                        <Button color="inherit">Contact</Button>
+                        <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
                     </Box>
                 </Toolbar>
             </AppBar>
 
-            {/* The rest of the landing page component remains the same... */}
             <Container maxWidth="lg">
                 {/* Hero Section */}
                 <Box
