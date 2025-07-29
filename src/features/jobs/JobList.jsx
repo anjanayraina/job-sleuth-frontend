@@ -151,7 +151,7 @@ export default function JobList() {
                             value={jobsPerPage}
                             label="Jobs per page"
                             onChange={handleJobsPerPageChange}
-                            variant="outlined" // Add this line
+                            variant="outlined"
 
                         >
                             {/* Updated the options as requested */}
