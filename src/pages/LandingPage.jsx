@@ -1,34 +1,48 @@
 import React from "react";
 import { Link as RouterLink } from 'react-router-dom';
-import { Typography, Button, Container, Grid, Card, CardMedia, CardContent, Box } from "@mui/material";
-import Header from "../components/Header"; // Import the new Header
+import { Typography, Button, Container, Grid, Box } from "@mui/material";
+import Header from "../components/Header";
+import JobCard from "../components/JobCard";
 
-// Mock data remains the same...
-const jobs = [
-    { id: "1", title: "Senior React Developer", company: "Innovatech Solutions", platform: "Discord", location: "Remote", tags: ["React", "TypeScript", "Node.js"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?react" },
-    { id: "2", title: "Solidity Engineer", company: "CryptoVerse", platform: "Telegram", location: "New York, NY", tags: ["Solidity", "Blockchain", "EVM"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?crypto" },
-    { id: "3", title: "Full-Stack Engineer", company: "DataStream", platform: "Discord", location: "San Francisco, CA", tags: ["Python", "Django", "React"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?code" },
-    { id: "4", title: "UX/UI Designer", company: "Creative Minds", platform: "Telegram", location: "Remote", tags: ["Figma", "User Research"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?design" },
-    { id: "5", title: "DevOps Specialist", company: "CloudNine", platform: "Discord", location: "Austin, TX", tags: ["Kubernetes", "Docker", "CI/CD"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?server" },
-    { id: "6", title: "Junior Frontend Developer", company: "WebCrafters Inc.", platform: "Telegram", location: "Remote", tags: ["HTML", "CSS", "JavaScript"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?web" },
+// Mock data for the "Latest Jobs" section
+const latestJobs = [
+    { id: "1", title: "Senior React Developer", company: "Innovatech Solutions", platform: "Discord", location: "Remote", tags: ["React", "TypeScript", "Node.js"], url: "https://example.com" },
+    { id: "2", title: "Solidity Engineer (DeFi)", company: "CryptoVerse", platform: "Telegram", location: "New York, NY", tags: ["Solidity", "Blockchain", "EVM"], url: "https://example.com" },
+    { id: "3", title: "Full-Stack Engineer", company: "DataStream", platform: "Discord", location: "San Francisco, CA", tags: ["Python", "Django", "React"], url: "https://example.com" },
+    { id: "4", title: "UX/UI Designer", company: "Creative Minds", platform: "Telegram", location: "Remote", tags: ["Figma", "User Research"], url: "https://example.com" },
+    { id: "5", title: "DevOps Specialist", company: "CloudNine", platform: "Discord", location: "Austin, TX", tags: ["Kubernetes", "Docker", "CI/CD"], url: "https://example.com" },
+    { id: "6", title: "Junior Frontend Developer", company: "WebCrafters Inc.", platform: "Telegram", location: "Remote", tags: ["HTML", "CSS", "JavaScript"], url: "https://example.com" },
 ];
 
-
 const LandingPage = () => {
+
+    const handleViewJob = (url) => {
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
     return (
-        <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
+        // The main background color is now a light blue
+        <Box sx={{ backgroundColor: '#e3f2fd', minHeight: '100vh' }}>
             <Header />
 
             <Container maxWidth="lg">
+                {/* --- Hero Section --- */}
                 <Box
                     sx={{
-                        textAlign: 'center',
+                        position: 'relative',
                         color: 'white',
-                        py: 12,
+                        py: { xs: 8, md: 14 },
                         my: 4,
                         borderRadius: 3,
-                        background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                        boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                        overflow: 'hidden',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        // Using a darker blue gradient for the hero to stand out
+                        background: 'linear-gradient(45deg, #1976D2 30%, #21CBF3 90%)',
+                        boxShadow: '0 5px 15px rgba(0,0,0,0.2)',
                     }}
                 >
                     <Typography variant="h2" component="h1" fontWeight="700" gutterBottom>
@@ -42,75 +56,42 @@ const LandingPage = () => {
                         size="large"
                         component={RouterLink}
                         to="/jobs"
+                        color="primary"
                         sx={{
-                            fontWeight: 'bold',
-                            py: 1.5,
-                            px: 4,
+                            // A subtle style for the button to make it pop
                             backgroundColor: 'white',
-                            color: '#2196F3',
-                            '&:hover': {
-                                backgroundColor: 'grey.100',
-                            }
+                            color: 'primary.main',
+                            '&:hover': { backgroundColor: 'grey.200' }
                         }}
                     >
                         Browse Live Jobs
                     </Button>
                 </Box>
 
-                {/* Latest Jobs Section */}
+                {/* --- Latest Jobs Section --- */}
                 <Box sx={{ py: 6 }}>
-                    <Typography variant="h4" component="h2" fontWeight="bold" gutterBottom sx={{ textAlign: 'center', mb: 4 }}>
+                    <Typography variant="h4" component="h2" fontWeight="bold" gutterBottom sx={{ textAlign: 'center', mb: 4, color: 'primary.dark' }}>
                         Latest Jobs
                     </Typography>
                     <Grid container spacing={4}>
-                        {jobs.map((job, idx) => (
-                            <Grid item key={idx} xs={12} sm={6} md={4}>
-                                <Card sx={{
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-                                    '&:hover': {
-                                        transform: 'translateY(-8px)',
-                                        boxShadow: '0 12px 24px rgba(0,0,0,0.15)',
-                                    },
-                                }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="160"
-                                        image={job.image}
-                                        alt={job.title}
-                                    />
-                                    <CardContent>
-                                        <Typography gutterBottom variant="h6" component="div" fontWeight="bold">
-                                            {job.title}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                            {job.company}
-                                        </Typography>
-                                        <Box
-                                            sx={{
-                                                display: 'inline-block',
-                                                px: 1.5,
-                                                py: 0.5,
-                                                borderRadius: '12px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 'bold',
-                                                backgroundColor: job.platform.toLowerCase() === 'telegram' ? '#e3f2fd' : '#ede7f6',
-                                                color: job.platform.toLowerCase() === 'telegram' ? '#0d47a1' : '#5e35b1',
-                                            }}
-                                        >
-                                            {job.platform}
-                                        </Box>
-                                    </CardContent>
-                                </Card>
+                        {latestJobs.map((job) => (
+                            <Grid item key={job.id} xs={12} sm={6} md={4}>
+                                <JobCard
+                                    title={job.title}
+                                    company={job.company}
+                                    platform={job.platform}
+                                    channel={job.location}
+                                    time={"Posted recently"}
+                                    tags={job.tags}
+                                    onView={() => handleViewJob(job.url)}
+                                />
                             </Grid>
                         ))}
                     </Grid>
                 </Box>
             </Container>
-            {/* Footer */}
-            <Box component="footer" sx={{ py: 3, textAlign: 'center', color: 'grey.600', mt: 'auto' }}>
+
+            <Box component="footer" sx={{ py: 3, textAlign: 'center', color: 'primary.dark', mt: 'auto' }}>
                 <Typography variant="body2">
                     © 2024 JobSleuth. All rights reserved.
                 </Typography>

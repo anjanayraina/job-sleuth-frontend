@@ -6,7 +6,7 @@ import { WorkOutline, Email, Phone, LocationOn } from '@mui/icons-material';
 const AboutPage = () => {
     return (
         <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
-            <Header /> {/* Use the new Header component */}
+            <Header />
 
             <Container maxWidth="md" sx={{ py: 5 }}>
                 <Paper elevation={3} sx={{ p: { xs: 2, md: 5 }, borderRadius: 3 }}>
