@@ -1,4 +1,4 @@
-// src/services/jobApi.js
+// src/services/JobApi.js
 import { JobSearchRequest } from "./JobSearchRequest";
 
 export async function fetchJobs(jobSearchRequest = new JobSearchRequest()) {

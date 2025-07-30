@@ -1,68 +1,25 @@
 import React from "react";
 import { Link as RouterLink } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardMedia, CardContent, Box } from "@mui/material";
-import { WorkOutline } from "@mui/icons-material";
+import { Typography, Button, Container, Grid, Card, CardMedia, CardContent, Box } from "@mui/material";
+import Header from "../components/Header"; // Import the new Header
 
 // Mock data remains the same...
 const jobs = [
-    {
-        title: "Senior Solidity Engineer",
-        company: "BlockChain Co.",
-        platform: "Telegram",
-        image: "https://source.unsplash.com/random/300x300?blockchain",
-    },
-    {
-        title: "Frontend Developer",
-        company: "WebCrafters Inc.",
-        platform: "Discord",
-        image: "https://source.unsplash.com/random/300x300?frontend",
-    },
-    {
-        title: "Product Manager",
-        company: "Innovate Solutions",
-        platform: "Telegram",
-        image: "https://source.unsplash.com/random/300x300?product",
-    },
-    {
-        title: "Data Scientist",
-        company: "Data Insights Corp.",
-        platform: "Discord",
-        image: "https://source.unsplash.com/random/300x300?data",
-    },
-    {
-        title: "UX Designer",
-        company: "User Experience Studio",
-        platform: "Telegram",
-        image: "https://source.unsplash.com/random/300x300?ux",
-    },
-    {
-        title: "DevOps Engineer",
-        company: "CloudOps Ltd.",
-        platform: "Discord",
-        image: "https://source.unsplash.com/random/300x300?devops",
-    },
+    { id: "1", title: "Senior React Developer", company: "Innovatech Solutions", platform: "Discord", location: "Remote", tags: ["React", "TypeScript", "Node.js"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?react" },
+    { id: "2", title: "Solidity Engineer", company: "CryptoVerse", platform: "Telegram", location: "New York, NY", tags: ["Solidity", "Blockchain", "EVM"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?crypto" },
+    { id: "3", title: "Full-Stack Engineer", company: "DataStream", platform: "Discord", location: "San Francisco, CA", tags: ["Python", "Django", "React"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?code" },
+    { id: "4", title: "UX/UI Designer", company: "Creative Minds", platform: "Telegram", location: "Remote", tags: ["Figma", "User Research"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?design" },
+    { id: "5", title: "DevOps Specialist", company: "CloudNine", platform: "Discord", location: "Austin, TX", tags: ["Kubernetes", "Docker", "CI/CD"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?server" },
+    { id: "6", title: "Junior Frontend Developer", company: "WebCrafters Inc.", platform: "Telegram", location: "Remote", tags: ["HTML", "CSS", "JavaScript"], url: "https://example.com", image: "https://source.unsplash.com/random/300x300?web" },
 ];
+
 
 const LandingPage = () => {
     return (
         <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
-            {/* Header */}
-            <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
-                <Toolbar>
-                    <WorkOutline sx={{ mr: 1.5 }} />
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                        JobSleuth
-                    </Typography>
-                    <Box>
-                        <Button color="inherit" component={RouterLink} to="/">Home</Button>
-                        <Button color="inherit" component={RouterLink} to="/about">About</Button>
-                        <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+            <Header />
 
             <Container maxWidth="lg">
-                {/* Hero Section */}
                 <Box
                     sx={{
                         textAlign: 'center',
@@ -112,7 +69,7 @@ const LandingPage = () => {
                                     height: '100%',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
                                     '&:hover': {
                                         transform: 'translateY(-8px)',
                                         boxShadow: '0 12px 24px rgba(0,0,0,0.15)',

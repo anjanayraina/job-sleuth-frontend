@@ -1,24 +1,20 @@
 import React, { useState } from "react";
-import { Link as RouterLink } from 'react-router-dom';
 import JobCard from "../../components/JobCard";
+import Header from "../../components/Header"; // Import the new Header
 import {
     Container,
     Grid,
     TextField,
     Typography,
     Box,
-    AppBar,
-    Toolbar,
-    Button,
     Pagination,
     FormControl,
     InputLabel,
     Select,
     MenuItem
 } from "@mui/material";
-import { WorkOutline } from '@mui/icons-material';
 
-// Expanded mock data to 20 jobs to better demonstrate pagination.
+// mockJobs array remains the same...
 const mockJobs = [
     { id: "1", title: "Senior React Developer", company: "Innovatech Solutions", platform: "Discord", location: "Remote", tags: ["React", "TypeScript", "Node.js"], url: "https://example.com" },
     { id: "2", title: "Solidity Engineer (DeFi)", company: "CryptoVerse", platform: "Telegram", location: "New York, NY", tags: ["Solidity", "Blockchain", "EVM"], url: "https://example.com" },
@@ -46,7 +42,6 @@ const mockJobs = [
 export default function JobList() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
-    // Changed the default jobs per page to 10
     const [jobsPerPage, setJobsPerPage] = useState(10);
 
     const filteredJobs = mockJobs.filter(job =>
@@ -55,7 +50,6 @@ export default function JobList() {
         job.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
     );
 
-    // Pagination Logic
     const indexOfLastJob = page * jobsPerPage;
     const indexOfFirstJob = indexOfLastJob - jobsPerPage;
     const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
@@ -67,7 +61,7 @@ export default function JobList() {
 
     const handleJobsPerPageChange = (event) => {
         setJobsPerPage(parseInt(event.target.value, 10));
-        setPage(1); // Reset to the first page
+        setPage(1);
     };
 
     const handleViewJob = (url) => {
@@ -76,20 +70,7 @@ export default function JobList() {
 
     return (
         <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
-            {/* Header */}
-            <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
-                <Toolbar>
-                    <WorkOutline sx={{ mr: 1.5 }} />
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                        JobSleuth
-                    </Typography>
-                    <Box>
-                        <Button color="inherit" component={RouterLink} to="/">Home</Button>
-                        <Button color="inherit" component={RouterLink} to="/about">About</Button>
-                        <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+            <Header /> {/* Use the new Header component */}
 
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <Box sx={{ mb: 4, textAlign: 'center' }}>
@@ -134,7 +115,6 @@ export default function JobList() {
                     )}
                 </Grid>
 
-                {/* Pagination and Jobs Per Page Controls */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 5, p: 2, flexWrap: 'wrap', gap: 2 }}>
                     <Pagination
                         count={pageCount}
@@ -152,9 +132,7 @@ export default function JobList() {
                             label="Jobs per page"
                             onChange={handleJobsPerPageChange}
                             variant="outlined"
-
                         >
-                            {/* Updated the options as requested */}
                             <MenuItem value={10}>10</MenuItem>
                             <MenuItem value={20}>20</MenuItem>
                             <MenuItem value={50}>50</MenuItem>

@@ -1,26 +1,12 @@
 import React from 'react';
-import { Box, Container, Typography, Paper, Avatar, List, ListItem, ListItemIcon, ListItemText, AppBar, Toolbar, Button } from '@mui/material';
+import Header from '../components/Header'; // Import the new Header
+import { Box, Container, Typography, Paper, Avatar, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { WorkOutline, Email, Phone, LocationOn } from '@mui/icons-material';
-import { Link as RouterLink } from 'react-router-dom';
 
 const AboutPage = () => {
     return (
         <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
-            {/* Header */}
-            <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
-                <Toolbar>
-                    <WorkOutline sx={{ mr: 1.5 }} />
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                        JobSleuth
-                    </Typography>
-                    <Box>
-                        <Button color="inherit" component={RouterLink} to="/">Home</Button>
-                        <Button color="inherit" component={RouterLink} to="/about">About</Button>
-                        <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
-                        <Button color="inherit" component={RouterLink} to="/jobs">Browse Jobs</Button>
-                    </Box>
-                </Toolbar>
-            </AppBar>
+            <Header /> {/* Use the new Header component */}
 
             <Container maxWidth="md" sx={{ py: 5 }}>
                 <Paper elevation={3} sx={{ p: { xs: 2, md: 5 }, borderRadius: 3 }}>
