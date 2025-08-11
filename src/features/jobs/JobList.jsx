@@ -1,147 +1,174 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import Header from "../../components/Header";
 import JobCard from "../../components/JobCard";
-import Header from "../../components/Header"; // Import the new Header
+import { jobService } from "../../services/jobService"; // Use the new service
 import {
-    Container,
-    Grid,
-    TextField,
-    Typography,
-    Box,
-    Pagination,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem
+  Container,
+  Grid,
+  TextField,
+  Typography,
+  Box,
+  Pagination,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Alert
 } from "@mui/material";
 
-// mockJobs array remains the same...
-const mockJobs = [
-    { id: "1", title: "Senior React Developer", company: "Innovatech Solutions", platform: "Discord", location: "Remote", tags: ["React", "TypeScript", "Node.js"], url: "https://example.com" },
-    { id: "2", title: "Solidity Engineer (DeFi)", company: "CryptoVerse", platform: "Telegram", location: "New York, NY", tags: ["Solidity", "Blockchain", "EVM"], url: "https://example.com" },
-    { id: "3", title: "Full-Stack Engineer", company: "DataStream", platform: "Discord", location: "San Francisco, CA", tags: ["Python", "Django", "React"], url: "https://example.com" },
-    { id: "4", title: "UX/UI Designer", company: "Creative Minds", platform: "Telegram", location: "Remote", tags: ["Figma", "User Research"], url: "https://example.com" },
-    { id: "5", title: "DevOps Specialist", company: "CloudNine", platform: "Discord", location: "Austin, TX", tags: ["Kubernetes", "Docker", "CI/CD"], url: "https://example.com" },
-    { id: "6", title: "Junior Frontend Developer", company: "WebCrafters Inc.", platform: "Telegram", location: "Remote", tags: ["HTML", "CSS", "JavaScript"], url: "https://example.com" },
-    { id: "7", title: "Backend Engineer (Go)", company: "ScaleFast", platform: "Discord", location: "Remote", tags: ["Go", "Microservices", "gRPC"], url: "https://example.com" },
-    { id: "8", title: "Data Analyst", company: "Insightful", platform: "Telegram", location: "Boston, MA", tags: ["SQL", "Tableau", "Python"], url: "https://example.com" },
-    { id: "9", title: "Mobile Engineer (React Native)", company: "AppWorks", platform: "Discord", location: "Remote", tags: ["React Native", "iOS", "Android"], url: "https://example.com" },
-    { id: "10", title: "Marketing Manager", company: "GrowthHackers", platform: "Telegram", location: "London, UK", tags: ["SEO", "Content Marketing"], url: "https://example.com" },
-    { id: "11", title: "Cybersecurity Analyst", company: "SecureNet", platform: "Discord", location: "Washington D.C.", tags: ["Security", "Penetration Testing"], url: "https://example.com" },
-    { id: "12", title: "Project Manager", company: "Leadway", platform: "Telegram", location: "Remote", tags: ["Agile", "Scrum", "JIRA"], url: "https://example.com" },
-    { id: "13", title: "Lead Game Developer", company: "PixelPlay", platform: "Discord", location: "Los Angeles, CA", tags: ["Unity", "C#", "Game Design"], url: "https://example.com" },
-    { id: "14", title: "AI/ML Engineer", company: "FutureAI", platform: "Telegram", location: "Remote", tags: ["Python", "TensorFlow", "PyTorch"], url: "https://example.com" },
-    { id: "15", title: "Cloud Architect", company: "InfraCloud", platform: "Discord", location: "Seattle, WA", tags: ["AWS", "Azure", "GCP"], url: "https://example.com" },
-    { id: "16", title: "Technical Writer", company: "DocuGen", platform: "Telegram", location: "Remote", tags: ["Documentation", "API", "Markdown"], url: "https://example.com" },
-    { id: "17", title: "QA Automation Engineer", company: "TestRight", platform: "Discord", location: "Remote", tags: ["Selenium", "Cypress", "Testing"], url: "https://example.com" },
-    { id: "18", title: "Product Owner", company: "Visionary Products", platform: "Telegram", location: "Remote", tags: ["Agile", "Product Strategy"], url: "https://example.com" },
-    { id: "19", title: "Blockchain Developer", company: "Ledger Group", platform: "Discord", location: "Remote", tags: ["Rust", "Solana", "Web3"], url: "https://example.com" },
-    { id: "20", title: "Database Administrator", company: "DataFortress", platform: "Telegram", location: "Dallas, TX", tags: ["SQL", "PostgreSQL", "MongoDB"], url: "https://example.com" }
-];
-
-
 export default function JobList() {
-    const [search, setSearch] = useState("");
-    const [page, setPage] = useState(1);
-    const [jobsPerPage, setJobsPerPage] = useState(10);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [jobsPerPage, setJobsPerPage] = useState(10);
 
-    const filteredJobs = mockJobs.filter(job =>
-        job.title.toLowerCase().includes(search.toLowerCase()) ||
-        job.company.toLowerCase().includes(search.toLowerCase()) ||
-        job.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
-    );
-
-    const indexOfLastJob = page * jobsPerPage;
-    const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-    const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
-    const pageCount = Math.ceil(filteredJobs.length / jobsPerPage);
-
-    const handlePageChange = (event, value) => {
-        setPage(value);
+  // This useEffect hook runs when the component mounts and when the 'search' term changes.
+  useEffect(() => {
+    const getJobs = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Use the jobService to fetch jobs from your backend API
+        const data = await jobService.getJobs({ tags: search }); 
+        
+        setJobs(data);
+      } catch (err) {
+        // Set an error message if the API call fails
+        setError("Failed to fetch jobs. Please ensure the backend server is running.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleJobsPerPageChange = (event) => {
-        setJobsPerPage(parseInt(event.target.value, 10));
-        setPage(1);
-    };
+    // Use a timer to prevent sending an API request on every single keystroke
+    const debounceTimer = setTimeout(() => {
+      getJobs();
+    }, 500); // Wait 500ms after the user stops typing
 
-    const handleViewJob = (url) => {
+    // Cleanup function to clear the timer
+    return () => clearTimeout(debounceTimer);
+  }, [search]); // The effect re-runs whenever the 'search' state changes
+
+  // --- Pagination Logic ---
+  const indexOfLastJob = page * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+  const pageCount = Math.ceil(jobs.length / jobsPerPage);
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handleJobsPerPageChange = (event) => {
+    setJobsPerPage(parseInt(event.target.value, 10));
+    setPage(1); // Reset to the first page
+  };
+  
+  // Helper function to extract a URL from markdown link format, e.g., [text](url)
+  const getJobUrl = (description) => {
+      if (!description) return null;
+      const match = description.match(/\[.*?\]\((.*?)\)/);
+      return match ? match[1] : null;
+  }
+
+  const handleViewJob = (job) => {
+    const url = job.link || getJobUrl(job.description);
+    if (url) {
         window.open(url, "_blank", "noopener,noreferrer");
-    };
+    } else {
+        alert("No direct application link found for this job.");
+    }
+  };
 
-    return (
-        <Box sx={{ backgroundColor: 'grey.50', minHeight: '100vh' }}>
-            <Header /> {/* Use the new Header component */}
+  return (
+    <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
+      <Header />
 
-            <Container maxWidth="lg" sx={{ py: 4 }}>
-                <Box sx={{ mb: 4, textAlign: 'center' }}>
-                    <Typography variant="h3" fontWeight="bold" gutterBottom>
-                        Discover Your Next Opportunity
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary">
-                        Search our collection of jobs from across the web.
-                    </Typography>
-                </Box>
-
-                <TextField
-                    fullWidth
-                    label="Search by title, company, or tag..."
-                    variant="outlined"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    sx={{ mb: 4, backgroundColor: 'white' }}
-                />
-
-                <Grid container spacing={4}>
-                    {currentJobs.length === 0 ? (
-                        <Grid item xs={12}>
-                            <Typography sx={{ textAlign: 'center', color: 'text.secondary', my: 5 }}>
-                                No jobs found. Try a different search term!
-                            </Typography>
-                        </Grid>
-                    ) : (
-                        currentJobs.map((job) => (
-                            <Grid item key={job.id} xs={12} sm={6} md={4}>
-                                <JobCard
-                                    title={job.title}
-                                    company={job.company}
-                                    platform={job.platform}
-                                    channel={job.location}
-                                    time={"Posted recently"}
-                                    tags={job.tags}
-                                    onView={() => handleViewJob(job.url)}
-                                />
-                            </Grid>
-                        ))
-                    )}
-                </Grid>
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 5, p: 2, flexWrap: 'wrap', gap: 2 }}>
-                    <Pagination
-                        count={pageCount}
-                        page={page}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="large"
-                    />
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <InputLabel id="jobs-per-page-label">Jobs per page</InputLabel>
-                        <Select
-                            labelId="jobs-per-page-label"
-                            id="jobs-per-page-select"
-                            value={jobsPerPage}
-                            label="Jobs per page"
-                            onChange={handleJobsPerPageChange}
-                            variant="outlined"
-                        >
-                            <MenuItem value={10}>10</MenuItem>
-                            <MenuItem value={20}>20</MenuItem>
-                            <MenuItem value={50}>50</MenuItem>
-                            <MenuItem value={100}>100</MenuItem>
-                            <MenuItem value={200}>200</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Box>
-            </Container>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography variant="h3" fontWeight="bold" gutterBottom>
+            Discover Your Next Opportunity
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Search our collection of jobs from across the web.
+          </Typography>
         </Box>
-    );
+
+        <TextField
+          fullWidth
+          label="Search by title, company, or tag..."
+          variant="outlined"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          sx={{ mb: 4, backgroundColor: 'background.paper' }}
+        />
+        
+        {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}>
+                <CircularProgress size={60} />
+            </Box>
+        ) : error ? (
+            <Alert severity="error" sx={{ my: 5 }}>{error}</Alert>
+        ) : (
+          <>
+            <Grid container spacing={4}>
+              {currentJobs.length === 0 ? (
+                <Grid item xs={12}>
+                  <Typography sx={{ textAlign: 'center', color: 'text.secondary', my: 5 }}>
+                    No jobs found. Try a different search!
+                  </Typography>
+                </Grid>
+              ) : (
+                currentJobs.map((job) => (
+                  <Grid item key={job.job_hash || job.id} xs={12} sm={6} md={4}>
+                    <JobCard
+                      title={job.title}
+                      company={job.company}
+                      platform={job.source || 'web'}
+                      channel={job.location || 'Remote'}
+                      time={new Date(job.date_posted).toLocaleDateString()}
+                      tags={job.tags || []}
+                      onView={() => handleViewJob(job)}
+                    />
+                  </Grid>
+                ))
+              )}
+            </Grid>
+
+            {jobs.length > 0 &&
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 5, p: 2, flexWrap: 'wrap', gap: 2 }}>
+                <Pagination
+                  count={pageCount}
+                  page={page}
+                  onChange={handlePageChange}
+                  color="primary"
+                  size="large"
+                />
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                  <InputLabel>Jobs per page</InputLabel>
+                  <Select
+                    value={jobsPerPage}
+                    label="Jobs per page"
+                    onChange={handleJobsPerPageChange}
+                    variant="outlined"
+                  >
+                    <MenuItem value={10}>10</MenuItem>
+                    <MenuItem value={20}>20</MenuItem>
+                    <MenuItem value={50}>50</MenuItem>
+                    <MenuItem value={100}>100</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            }
+          </>
+        )}
+      </Container>
+    </Box>
+  );
 }
