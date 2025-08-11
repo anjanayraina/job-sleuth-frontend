@@ -1,43 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Header from "../../components/Header";
 import JobCard from "../../components/JobCard";
-import JobDetailModal from "../../components/JobDetailModal"; // 1. Import the modal component
+import JobDetailModal from "../../components/JobDetailModal";
+import FilterControls from "../../components/FilterControls"; // Import the new filter component
 import { jobService } from "../../services/jobService";
 import {
-  Container,
-  Grid,
-  TextField,
-  Typography,
-  Box,
-  Pagination,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  CircularProgress,
-  Alert
+  Container, Grid, Typography, Box, Pagination,
+  FormControl, InputLabel, Select, MenuItem,
+  CircularProgress, Alert
 } from "@mui/material";
 
 export default function JobList() {
-  const [jobs, setJobs] = useState([]);
+  const [allJobs, setAllJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [jobsPerPage, setJobsPerPage] = useState(10);
 
-  // --- State to manage the modal ---
+  // State for filters
+  const [search, setSearch] = useState("");
+  const [platform, setPlatform] = useState('all');
+  const [location, setLocation] = useState('all');
+
+  // State for pagination
+  const [page, setPage] = useState(1);
+  const [jobsPerPage, setJobsPerPage] = useState(9);
+
+  // State for modal
   const [selectedJob, setSelectedJob] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // ---------------------------------
 
   useEffect(() => {
     const getJobs = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await jobService.getJobs({ tags: search });
-        setJobs(data);
+        const data = await jobService.getJobs();
+        setAllJobs(data);
       } catch (err) {
         setError("Failed to fetch jobs. Please ensure the backend server is running.");
         console.error(err);
@@ -45,11 +42,29 @@ export default function JobList() {
         setLoading(false);
       }
     };
-    const debounceTimer = setTimeout(() => getJobs(), 500);
-    return () => clearTimeout(debounceTimer);
-  }, [search]);
+    getJobs();
+  }, []);
 
-  // --- Functions to open and close the modal ---
+  // Memoized filtering logic
+  const filteredJobs = useMemo(() => {
+    return allJobs.filter(job => {
+      const searchTermMatch = search === '' ||
+          job.title.toLowerCase().includes(search.toLowerCase()) ||
+          job.company.toLowerCase().includes(search.toLowerCase()) ||
+          (job.tags && job.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())));
+
+      const platformMatch = platform === 'all' || (job.source && job.source.toLowerCase() === platform);
+
+      const locationMatch = location === 'all' || (job.location && job.location.toLowerCase().includes(location.toLowerCase()));
+
+      return searchTermMatch && platformMatch && locationMatch;
+    });
+  }, [allJobs, search, platform, location]);
+
+  // Pagination logic
+  const currentJobs = filteredJobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
+  const pageCount = Math.ceil(filteredJobs.length / jobsPerPage);
+
   const handleOpenModal = (job) => {
     setSelectedJob(job);
     setIsModalOpen(true);
@@ -59,24 +74,11 @@ export default function JobList() {
     setIsModalOpen(false);
     setSelectedJob(null);
   };
-  // --------------------------------------------
-
-  const indexOfLastJob = page * jobsPerPage;
-  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
-  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
-  const pageCount = Math.ceil(jobs.length / jobsPerPage);
-
-  const handlePageChange = (event, value) => setPage(value);
-  const handleJobsPerPageChange = (event) => {
-    setJobsPerPage(parseInt(event.target.value, 10));
-    setPage(1);
-  };
 
   return (
       <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
         <Header />
         <Container maxWidth="lg" sx={{ py: 4 }}>
-          {/* Search and Title section remains the same */}
           <Box sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
               Discover Your Next Opportunity
@@ -85,13 +87,14 @@ export default function JobList() {
               Search our collection of jobs from across the web.
             </Typography>
           </Box>
-          <TextField
-              fullWidth
-              label="Search by title, company, or tag..."
-              variant="outlined"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ mb: 4, backgroundColor: 'background.paper' }}
+
+          <FilterControls
+              search={search}
+              setSearch={setSearch}
+              platform={platform}
+              setPlatform={setPlatform}
+              location={location}
+              setLocation={setLocation}
           />
 
           {loading ? (
@@ -100,53 +103,37 @@ export default function JobList() {
               <Alert severity="error" sx={{ my: 5 }}>{error}</Alert>
           ) : (
               <>
-                <Grid container spacing={4}>
-                  {currentJobs.map((job) => (
-                      <Grid item key={job.job_hash || job.id} xs={12} sm={6} md={4}>
-                        <JobCard
-                            title={job.title}
-                            company={job.company}
-                            platform={job.source || 'web'}
-                            channel={job.location || 'Remote'}
-                            time={new Date(job.date_posted).toLocaleDateString()}
-                            tags={job.tags || []}
-                            // 2. The onView prop now correctly calls handleOpenModal
-                            onView={() => handleOpenModal(job)}
-                        />
+                <Grid container spacing={3}>
+                  {currentJobs.length === 0 ? (
+                      <Grid item xs={12}>
+                        <Typography sx={{ textAlign: 'center', color: 'text.secondary', my: 5, fontStyle: 'italic' }}>
+                          No jobs match your current filters. Try a different search!
+                        </Typography>
                       </Grid>
-                  ))}
+                  ) : (
+                      currentJobs.map((job) => (
+                          <Grid item key={job.job_hash} xs={12} sm={6} md={4}>
+                            <JobCard job={job} onView={() => handleOpenModal(job)} />
+                          </Grid>
+                      ))
+                  )}
                 </Grid>
-                {/* Pagination section remains the same */}
-                {jobs.length > 0 &&
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 5, p: 2, flexWrap: 'wrap', gap: 2 }}>
+
+                {filteredJobs.length > jobsPerPage &&
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
                       <Pagination
                           count={pageCount}
                           page={page}
-                          onChange={handlePageChange}
+                          onChange={(e, value) => setPage(value)}
                           color="primary"
                           size="large"
                       />
-                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <InputLabel>Jobs per page</InputLabel>
-                        <Select
-                            value={jobsPerPage}
-                            label="Jobs per page"
-                            onChange={handleJobsPerPageChange}
-                            variant="outlined"
-                        >
-                          <MenuItem value={10}>10</MenuItem>
-                          <MenuItem value={20}>20</MenuItem>
-                          <MenuItem value={50}>50</MenuItem>
-                          <MenuItem value={100}>100</MenuItem>
-                        </Select>
-                      </FormControl>
                     </Box>
                 }
               </>
           )}
         </Container>
 
-        {/* 3. The JobDetailModal is now rendered here */}
         <JobDetailModal
             job={selectedJob}
             open={isModalOpen}

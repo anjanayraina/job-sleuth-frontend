@@ -1,75 +1,69 @@
 import * as React from "react";
-import {
-    Card, CardHeader, CardContent, CardActions,
-    Button, Typography, Chip, Stack, Avatar
-} from "@mui/material";
+import { Card, CardHeader, CardContent, Button, Typography, Chip, Stack, Avatar, Divider, Box } from "@mui/material";
 import TelegramIcon from "@mui/icons-material/Telegram";
-import ChatIcon from "@mui/icons-material/Chat"; // Use as placeholder for Discord
+import ChatIcon from "@mui/icons-material/Chat"; // Placeholder for Discord
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-export default function JobCard({
-                                    title,
-                                    company,
-                                    platform,
-                                    channel,
-                                    time,
-                                    tags,
-                                    onView
-                                }) {
+export default function JobCard({ job, onView }) {
+    const { title, company, platform, location, tags } = job;
+
+    const handleButtonClick = (e) => {
+        e.stopPropagation();
+        const url = job.link || (job.description && job.description.match(/\[.*?\]\((.*?)\)/) ? job.description.match(/\[.*?\]\((.*?)\)/)[1] : null);
+        if (url) {
+            window.open(url, "_blank", "noopener,noreferrer");
+        } else {
+            alert("No direct application link found for this job.");
+        }
+    };
+
     return (
         <Card
-            elevation={5}
+            onClick={onView}
             sx={{
-                borderRadius: 3,
-                minWidth: 275,
+                borderRadius: 2,
                 height: '100%',
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                 '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 16px 32px rgba(33, 150, 243, 0.2)',
+                    transform: 'translateY(-5px) scale(1.02)',
+                    boxShadow: (theme) => `0 18px 36px ${theme.palette.primary.main}20`,
                 }
             }}
         >
             <CardHeader
                 avatar={
-                    <Avatar sx={{ bgcolor: platform === "Telegram" ? "#229ED9" : "#5865F2" }}>
-                        {platform === "Telegram"
-                            ? <TelegramIcon />
-                            : <ChatIcon /* Replace with <DiscordIcon /> when ready */ />
-                        }
+                    <Avatar sx={{ bgcolor: platform && platform.toLowerCase() === "telegram" ? "#229ED9" : "#5865F2" }}>
+                        {platform && platform.toLowerCase() === "telegram" ? <TelegramIcon /> : <ChatIcon />}
                     </Avatar>
                 }
-                title={<Typography variant="h6" fontWeight={700}>{title}</Typography>}
-                subheader={
-                    <Typography variant="subtitle2" color="text.secondary">
-                        {company} · {channel}
-                    </Typography>
-                }
+                title={<Typography variant="h6" fontWeight={600} noWrap>{title}</Typography>}
+                subheader={<Typography variant="body2" color="text.secondary" noWrap>{company}</Typography>}
             />
-            <CardContent>
-                <Stack direction="row" spacing={1} sx={{ mb: 1, flexWrap: "wrap", gap: 0.5 }}>
-                    {tags.map((tag) => (
-                        <Chip key={tag} label={tag} size="small" color="primary" variant="outlined" />
-                    ))}
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
-                    {time} · {platform}
+            <CardContent sx={{ flexGrow: 1, pt: 0 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                    {location || 'Remote'}
                 </Typography>
+                <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                    {tags && tags.slice(0, 3).map((tag) => (
+                        <Chip key={tag} label={tag} size="small" />
+                    ))}
+                    {tags && tags.length > 3 && <Chip label={`+${tags.length - 3}`} size="small" />}
+                </Stack>
             </CardContent>
-            <CardActions sx={{ mt: 'auto' }}>
+            <Divider sx={{ mx: 2 }} />
+            <Box sx={{ p: 2 }}>
                 <Button
                     variant="contained"
-                    color={platform === "Telegram" ? "info" : "secondary"}
                     fullWidth
-                    endIcon={
-                        platform === "Telegram"
-                            ? <TelegramIcon />
-                            : <ChatIcon /* Replace with <DiscordIcon /> when ready */ />
-                    }
-                    onClick={onView}
+                    onClick={handleButtonClick}
+                    endIcon={<OpenInNewIcon />}
                 >
-                    View on {platform}
+                    View Original Post
                 </Button>
-            </CardActions>
+            </Box>
         </Card>
     );
 }
