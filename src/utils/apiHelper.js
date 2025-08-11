@@ -3,7 +3,6 @@
  * It abstracts away the boilerplate of fetch, headers, and error handling.
  */
 const request = async (endpoint, options = {}) => {
-    // The full URL to the backend endpoint is hardcoded here.
     const url = `http://localhost:8000/jobs`;
 
     const defaultHeaders = {
@@ -39,7 +38,7 @@ export const apiHelper = {
      * Makes a GET request to the hardcoded URL.
      * The 'endpoint' and 'params' arguments are now ignored.
      */
-    get: (endpoint, params) => {
+    get: (endpoint) => {
         return request(endpoint, { method: 'GET' });
     },
 
