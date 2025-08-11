@@ -34,7 +34,7 @@ export default function JobList() {
         setError(null);
         
         // Use the jobService to fetch jobs from your backend API
-        const data = await jobService.getJobs({ tags: search }); 
+        const data = await jobService.getJobs();
         
         setJobs(data);
       } catch (err) {

@@ -6,13 +6,12 @@ import { apiHelper } from '../utils/apiHelper';
 export const jobService = {
     /**
      * Fetches a list of jobs from the backend.
-     * @param {object} params - Optional query parameters like { tags: 'react,python' }.
      * @returns {Promise<Array>} A promise that resolves to an array of job objects.
      */
-    getJobs: (params) => {
+    getJobs: () => {
         // This calls your backend's GET /api/jobs endpoint.
         // The apiHelper will automatically append the params to the URL.
-        return apiHelper.get('/jobs', params);
+            return apiHelper.get('http://localhost:8000/jobs');
     },
 
     /**
