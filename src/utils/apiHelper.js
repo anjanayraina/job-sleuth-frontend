@@ -1,14 +1,23 @@
-/**
- * A helper function to handle API requests.
- * It abstracts away the boilerplate of fetch, headers, and error handling.
- */
+import { API_BASE_URL } from '../config';
+import { authService } from '../services/authService'; // Import authService
+
 const request = async (endpoint, options = {}) => {
-    const url = `http://localhost:8000/jobs`;
+    const url = `${API_BASE_URL}${endpoint}`;
+    const token = authService.getToken(); // Get token from storage
 
     const defaultHeaders = {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
     };
+
+    // Only set Content-Type for JSON if the body is not form data
+    if (!(options.body instanceof URLSearchParams)) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
+    // If a token exists, add the Authorization header
+    if (token) {
+        defaultHeaders['Authorization'] = `Bearer ${token}`;
+    }
 
     const config = {
         ...options,
@@ -19,14 +28,12 @@ const request = async (endpoint, options = {}) => {
     };
 
     try {
-        console.log("Fetching from hardcoded URL: ", url);
         const response = await fetch(url, config);
-
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ message: response.statusText }));
             throw new Error(errorData.detail || errorData.message || 'An API error occurred');
         }
-        return response.json();
+        return response.status === 204 ? null : response.json();
     } catch (error) {
         console.error('API Helper Error:', error);
         throw error;
@@ -34,19 +41,21 @@ const request = async (endpoint, options = {}) => {
 };
 
 export const apiHelper = {
-    /**
-     * Makes a GET request to the hardcoded URL.
-     * The 'endpoint' and 'params' arguments are now ignored.
-     */
-    get: (endpoint) => {
-        return request(endpoint, { method: 'GET' });
+    get: (endpoint, params) => {
+        let url = endpoint;
+        if (params) {
+            const filteredParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v != null && v !== ''));
+            if (Object.keys(filteredParams).length > 0) {
+                url += `?${new URLSearchParams(filteredParams)}`;
+            }
+        }
+        return request(url, { method: 'GET' });
     },
-
-    /**
-     * Makes a POST request. The endpoint is ignored, but the body is sent.
-     * Note: This will still send the request to the hardcoded URL in the `request` function.
-     */
     post: (endpoint, body) => {
-        return request(endpoint, { method: 'POST', body: JSON.stringify(body) });
+        const isFormData = body instanceof URLSearchParams;
+        return request(endpoint, {
+            method: 'POST',
+            body: isFormData ? body : JSON.stringify(body)
+        });
     },
 };

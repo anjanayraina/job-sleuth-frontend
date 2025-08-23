@@ -27,6 +27,7 @@ const FilterControls = ({ search, setSearch, platform, setPlatform, location, se
                     >
                         <ToggleButton value="all" aria-label="all platforms">All</ToggleButton>
                         <ToggleButton value="telegram" aria-label="telegram">Telegram</ToggleButton>
+                        <ToggleButton value="linkedin" aria-label="linkedin">Linkedin</ToggleButton>
                         <ToggleButton value="discord" aria-label="discord">Discord</ToggleButton>
                     </ToggleButtonGroup>
                 </Box>

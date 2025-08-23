@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Header from "../../components/Header";
 import JobCard from "../../components/JobCard";
 import JobDetailModal from "../../components/JobDetailModal";
-import FilterControls from "../../components/FilterControls"; // Import the new filter component
+import FilterControls from "../../components/FilterControls";
 import { jobService } from "../../services/jobService";
 import {
   Container, Grid, Typography, Box, Pagination,
