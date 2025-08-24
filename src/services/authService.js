@@ -8,11 +8,9 @@ export const authService = {
      * @returns {Promise<object>} The response containing the access token.
      */
     login: (email, password) => {
-        const formData = new URLSearchParams();
-        formData.append('username', email);
-        formData.append('password', password);
 
-        return apiHelper.post('/auth/token', formData);
+
+        return apiHelper.post('/api/auth/token', {email: email, password: password});
     },
 
     /**
@@ -23,7 +21,7 @@ export const authService = {
      * @returns {Promise<object>} The response from the server.
      */
     signup: (username, email, password) => {
-        return apiHelper.post('/auth/signup', { username, email, password });
+        return apiHelper.post('/api/auth/signup', { username, email, password });
     },
 
     /**
