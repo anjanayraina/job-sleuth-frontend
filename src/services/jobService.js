@@ -11,7 +11,7 @@ export const jobService = {
     getJobs: () => {
         // This calls your backend's GET /api/jobs endpoint.
         // The apiHelper will automatically append the params to the URL.
-            return apiHelper.get('http://localhost:8000/jobs');
+            return apiHelper.get('/api/jobs');
     },
 
     /**

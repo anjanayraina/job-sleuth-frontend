@@ -4,6 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 const FilterControls = ({ search, setSearch, platform, setPlatform, location, setLocation }) => {
     const handlePlatformChange = (event, newPlatform) => {
+        // Ensures a button is always selected
         if (newPlatform !== null) {
             setPlatform(newPlatform);
         }

@@ -22,8 +22,9 @@ const LoginPage = () => {
             const response = await authService.login(email, password);
             if (response && response.access_token) {
                 authService.storeToken(response.access_token);
-                navigate('/jobs'); // Redirect on success
-                window.location.reload(); // Force reload to update header
+                // Redirect to the homepage on successful login
+                navigate('/');
+                window.location.reload(); // Force a reload to update the header
             } else {
                 setError("Login failed. Please check your credentials.");
             }
