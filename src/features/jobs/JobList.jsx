@@ -1,144 +1,79 @@
-import React, { useState, useEffect, useMemo } from "react";
-import Header from "../../components/Header";
-import JobCard from "../../components/JobCard";
-import JobDetailModal from "../../components/JobDetailModal";
-import FilterControls from "../../components/FilterControls";
-import { jobService } from "../../services/jobService";
-import {
-  Container, Grid, Typography, Box, Pagination,
-  FormControl, InputLabel, Select, MenuItem,
-  CircularProgress, Alert
-} from "@mui/material";
+import * as React from "react";
+import { Card, CardHeader, CardContent, Button, Typography, Chip, Stack, Avatar, Divider, Box } from "@mui/material";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import ChatIcon from "@mui/icons-material/Chat"; // Placeholder for Discord
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
-export default function JobList() {
-  const [allJobs, setAllJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function JobCard({ job, onView }) {
+  // This check prevents the crash if job is undefined.
+  if (!job) {
+    return null;
+  }
 
-  // State for filters
-  const [search, setSearch] = useState("");
-  const [platform, setPlatform] = useState('all');
-  const [location, setLocation] = useState('all');
+  const { title, company, source, location, tags, description, link } = job;
 
-  // State for pagination
-  const [page, setPage] = useState(1);
-  const [jobsPerPage, setJobsPerPage] = useState(9);
-
-  // State for modal
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  useEffect(() => {
-    const getJobs = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await jobService.getJobs();
-        setAllJobs(data);
-      } catch (err) {
-        setError("Failed to fetch jobs. Please ensure the backend server is running.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getJobs();
-  }, []);
-
-  // Memoized filtering logic
-  const filteredJobs = useMemo(() => {
-    return allJobs.filter(job => {
-      const searchTermMatch = search === '' ||
-          job.title.toLowerCase().includes(search.toLowerCase()) ||
-          job.company.toLowerCase().includes(search.toLowerCase()) ||
-          (job.tags && job.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())));
-
-      const platformMatch = platform === 'all' || (job.source && job.source.toLowerCase() === platform);
-
-      const locationMatch = location === 'all' || (job.location && job.location.toLowerCase().includes(location.toLowerCase()));
-
-      return searchTermMatch && platformMatch && locationMatch;
-    });
-  }, [allJobs, search, platform, location]);
-
-  // Pagination logic
-  const currentJobs = filteredJobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
-  const pageCount = Math.ceil(filteredJobs.length / jobsPerPage);
-
-  const handleOpenModal = (job) => {
-    setSelectedJob(job);
-    setIsModalOpen(true);
+  const getJobUrl = (desc) => {
+    if (!desc) return null;
+    const match = desc.match(/\[.*?\]\((.*?)\)/);
+    return match ? match[1] : null;
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedJob(null);
+  const handleButtonClick = (e) => {
+    e.stopPropagation();
+    const url = link || getJobUrl(description);
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      alert("No direct application link found for this job.");
+    }
   };
 
   return (
-      <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
-        <Header />
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ mb: 4, textAlign: 'center' }}>
-            <Typography variant="h3" fontWeight="bold" gutterBottom>
-              Discover Your Next Opportunity
-            </Typography>
-            <Typography variant="h6" color="text.secondary">
-              Search our collection of jobs from across the web.
-            </Typography>
-          </Box>
-
-          <FilterControls
-              search={search}
-              setSearch={setSearch}
-              platform={platform}
-              setPlatform={setPlatform}
-              location={location}
-              setLocation={setLocation}
-          />
-
-          {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress size={60} /></Box>
-          ) : error ? (
-              <Alert severity="error" sx={{ my: 5 }}>{error}</Alert>
-          ) : (
-              <>
-                <Grid container spacing={3}>
-                  {currentJobs.length === 0 ? (
-                      <Grid item xs={12}>
-                        <Typography sx={{ textAlign: 'center', color: 'text.secondary', my: 5, fontStyle: 'italic' }}>
-                          No jobs match your current filters. Try a different search!
-                        </Typography>
-                      </Grid>
-                  ) : (
-                      currentJobs.map((job) => (
-                          <Grid item key={job.job_hash} xs={12} sm={6} md={4}>
-                            <JobCard job={job} onView={() => handleOpenModal(job)} />
-                          </Grid>
-                      ))
-                  )}
-                </Grid>
-
-                {filteredJobs.length > jobsPerPage &&
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-                      <Pagination
-                          count={pageCount}
-                          page={page}
-                          onChange={(e, value) => setPage(value)}
-                          color="primary"
-                          size="large"
-                      />
-                    </Box>
-                }
-              </>
-          )}
-        </Container>
-
-        <JobDetailModal
-            job={selectedJob}
-            open={isModalOpen}
-            onClose={handleCloseModal}
+      <Card
+          onClick={onView}
+          sx={{
+            borderRadius: 3,
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'translateY(-6px) scale(1.01)',
+              boxShadow: (theme) => `0 20px 40px ${theme.palette.primary.main}25`,
+            }
+          }}
+      >
+        <CardHeader
+            avatar={
+              <Avatar sx={{ bgcolor: source && source.toLowerCase() === "telegram" ? "#229ED9" : "#5865F2" }}>
+                {source && source.toLowerCase() === "telegram" ? <TelegramIcon /> : <ChatIcon />}
+              </Avatar>
+            }
+            title={<Typography variant="h6" fontWeight={600} noWrap>{title}</Typography>}
+            subheader={<Typography variant="body2" color="text.secondary" noWrap>{company}</Typography>}
         />
-      </Box>
+        <CardContent sx={{ flexGrow: 1, pt: 0 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+            {location || 'Remote'}
+          </Typography>
+          <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+            {tags && tags.slice(0, 3).map((tag) => (
+                <Chip key={tag} label={tag} size="small" />
+            ))}
+            {tags && tags.length > 3 && <Chip label={`+${tags.length - 3}`} size="small" />}
+          </Stack>
+        </CardContent>
+        <Divider sx={{ mx: 2 }} />
+        <Box sx={{ p: 2 }}>
+          <Button
+              fullWidth
+              onClick={handleButtonClick}
+              endIcon={<OpenInNewIcon />}
+          >
+            View Original Post
+          </Button>
+        </Box>
+      </Card>
   );
 }
