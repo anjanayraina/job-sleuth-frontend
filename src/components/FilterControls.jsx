@@ -1,12 +1,10 @@
 import React from 'react';
-import { Box, TextField, Paper, Typography, ToggleButton, ToggleButtonGroup, Button } from '@mui/material';
+import { Box, TextField, Paper, Typography, ToggleButton, ToggleButtonGroup, Button, Divider } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 const FilterControls = ({ filters, setFilters }) => {
-    const handlePlatformChange = (event, newPlatform) => {
-        if (newPlatform !== null) {
-            setFilters(prev => ({ ...prev, platform: newPlatform }));
-        }
+    const handlePlatformChange = (event, newPlatforms) => {
+        setFilters(prev => ({ ...prev, platforms: newPlatforms }));
     };
 
     const handleLocationChange = (event, newLocation) => {
@@ -20,7 +18,7 @@ const FilterControls = ({ filters, setFilters }) => {
     };
 
     const clearFilters = () => {
-        setFilters({ search: '', platform: 'all', location: 'all' });
+        setFilters({ search: '', platforms: [], location: 'all' });
     };
 
     return (
@@ -28,7 +26,7 @@ const FilterControls = ({ filters, setFilters }) => {
             <Typography variant="h6" gutterBottom>Filters</Typography>
             <TextField
                 fullWidth
-                placeholder="Search..."
+                placeholder="Search by title, keyword..."
                 variant="outlined"
                 size="small"
                 value={filters.search}
@@ -38,17 +36,34 @@ const FilterControls = ({ filters, setFilters }) => {
                 }}
                 sx={{ mb: 2 }}
             />
+            <Divider sx={{ my: 2 }} />
             <Box>
-                <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 'bold' }}>Platform</Typography>
-                <ToggleButtonGroup value={filters.platform} exclusive onChange={handlePlatformChange} aria-label="platform">
-                    <ToggleButton value="all">All</ToggleButton>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Platform</Typography>
+                <ToggleButtonGroup
+                    value={filters.platforms}
+                    onChange={handlePlatformChange}
+                    aria-label="platform filter"
+                    orientation="vertical"
+                    fullWidth
+                    sx={{ mt: 1 }}
+                >
                     <ToggleButton value="telegram">Telegram</ToggleButton>
                     <ToggleButton value="discord">Discord</ToggleButton>
+                    <ToggleButton value="linkedin">LinkedIn</ToggleButton>
+                    <ToggleButton value="web">Other</ToggleButton>
                 </ToggleButtonGroup>
             </Box>
+            <Divider sx={{ my: 2 }} />
             <Box>
-                <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 'bold' }}>Location</Typography>
-                <ToggleButtonGroup value={filters.location} exclusive onChange={handleLocationChange} aria-label="location">
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Location</Typography>
+                <ToggleButtonGroup
+                    value={filters.location}
+                    exclusive
+                    fullWidth
+                    onChange={handleLocationChange}
+                    aria-label="location filter"
+                    sx={{ mt: 1 }}
+                >
                     <ToggleButton value="all">All</ToggleButton>
                     <ToggleButton value="Remote">Remote</ToggleButton>
                 </ToggleButtonGroup>

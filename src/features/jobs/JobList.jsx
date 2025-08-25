@@ -6,7 +6,7 @@ import FilterControls from "../../components/FilterControls";
 import { jobService } from "../../services/jobService";
 import {
     Container, Grid, Typography, Box, Pagination,
-    CircularProgress, Alert
+    CircularProgress, Alert, FormControl, InputLabel, Select, MenuItem
 } from "@mui/material";
 
 export default function JobList() {
@@ -16,12 +16,12 @@ export default function JobList() {
 
     const [filters, setFilters] = useState({
         search: '',
-        platform: 'all',
+        platforms: [],
         location: 'all',
     });
 
     const [page, setPage] = useState(1);
-    const [jobsPerPage] = useState(12);
+    const [jobsPerPage, setJobsPerPage] = useState(12); // Default jobs per page
 
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +34,6 @@ export default function JobList() {
                 setAllJobs(data || []);
             } catch (err) {
                 setError("Please log in to view job listings.");
-                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -46,11 +45,15 @@ export default function JobList() {
         return allJobs.filter(job => {
             if (!job || !job.title || !job.company) return false;
 
+            const searchLower = filters.search.toLowerCase();
             const searchTermMatch = filters.search === '' ||
-                job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                job.company.toLowerCase().includes(filters.search.toLowerCase());
+                job.title.toLowerCase().includes(searchLower) ||
+                job.company.toLowerCase().includes(searchLower) ||
+                job.description.toLowerCase().includes(searchLower) ||
+                job.source.toLowerCase().includes(searchLower) ||
+                (job.tags && job.tags.some(tag => tag.toLowerCase().includes(searchLower)));
 
-            const platformMatch = filters.platform === 'all' || (job.source && job.source.toLowerCase() === filters.platform);
+            const platformMatch = filters.platforms.length === 0 || (job.source && filters.platforms.includes(job.source.toLowerCase()));
 
             const locationMatch = filters.location === 'all' || (job.location && job.location.toLowerCase().includes(filters.location.toLowerCase()));
 
@@ -71,20 +74,37 @@ export default function JobList() {
         setSelectedJob(null);
     };
 
+    const handleJobsPerPageChange = (event) => {
+        setJobsPerPage(parseInt(event.target.value, 10));
+        setPage(1); // Reset to the first page when changing items per page
+    };
+
     return (
         <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
             <Header />
-            <Container maxWidth="xl" sx={{ py: 4, display: 'flex', gap: 3 }}>
-                {/* Left Column: Filters */}
+            <Container maxWidth="xl" sx={{ py: 4, display: 'flex', gap: 4 }}>
                 <Box sx={{ width: '25%', display: { xs: 'none', md: 'block' } }}>
                     <FilterControls filters={filters} setFilters={setFilters} />
                 </Box>
 
-                {/* Right Column: Job Listings */}
                 <Box sx={{ width: { xs: '100%', md: '75%' } }}>
-                    <Typography variant="h5" sx={{ mb: 2 }}>
-                        Showing {filteredJobs.length} open roles
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography variant="h5">
+                            Showing {filteredJobs.length} open roles
+                        </Typography>
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel>Jobs per page</InputLabel>
+                            <Select
+                                value={jobsPerPage}
+                                label="Jobs per page"
+                                onChange={handleJobsPerPageChange}
+                            >
+                                <MenuItem value={12}>12</MenuItem>
+                                <MenuItem value={24}>24</MenuItem>
+                                <MenuItem value={36}>36</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
                     {loading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress size={60} /></Box>
                     ) : error ? (
@@ -93,11 +113,12 @@ export default function JobList() {
                         <>
                             <Grid container spacing={2}>
                                 {currentJobs.map((job) => (
-                                    <Grid key={job.job_hash} item xs={12} sm={6} md={4}>
+                                    <Grid item key={job.job_hash} xs={12} sm={6} md={4}>
                                         <JobCard job={job} onView={() => handleOpenModal(job)} />
                                     </Grid>
                                 ))}
                             </Grid>
+
                             {filteredJobs.length > jobsPerPage &&
                                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                                     <Pagination count={pageCount} page={page} onChange={(e, value) => setPage(value)} color="primary" />

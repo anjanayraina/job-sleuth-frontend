@@ -2,7 +2,24 @@ import * as React from "react";
 import { Card, CardHeader, CardContent, Button, Typography, Chip, Stack, Avatar, Divider, Box } from "@mui/material";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import ChatIcon from "@mui/icons-material/Chat"; // Placeholder for Discord
+import LinkedInIcon from '@mui/icons-material/LinkedIn'; // 1. Import the LinkedIn Icon
+import LanguageIcon from '@mui/icons-material/Language';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+
+// 2. Add LinkedIn to our platform icons and colors
+const platformIcons = {
+    telegram: <TelegramIcon />,
+    discord: <ChatIcon />,
+    linkedin: <LinkedInIcon />,
+    default: <LanguageIcon />,
+};
+
+const platformColors = {
+    telegram: '#229ED9',
+    discord: '#5865F2',
+    linkedin: '#0A66C2', // LinkedIn's brand blue
+    default: 'grey.700',
+};
 
 export default function JobCard({ job, onView }) {
     if (!job) {
@@ -27,14 +44,16 @@ export default function JobCard({ job, onView }) {
         }
     };
 
+    const platformKey = source ? source.toLowerCase() : 'default';
+
     return (
         <Card
             onClick={onView}
             sx={{
                 borderRadius: 3,
-                height: '100%', // This is crucial for making cards in the same row equal height
+                height: '100%',
                 display: 'flex',
-                flexDirection: 'column', // Ensures content flows top-to-bottom
+                flexDirection: 'column',
                 cursor: 'pointer',
                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                 '&:hover': {
@@ -45,14 +64,13 @@ export default function JobCard({ job, onView }) {
         >
             <CardHeader
                 avatar={
-                    <Avatar sx={{ bgcolor: source && source.toLowerCase() === "telegram" ? "#229ED9" : "#5865F2" }}>
-                        {source && source.toLowerCase() === "telegram" ? <TelegramIcon /> : <ChatIcon />}
+                    <Avatar sx={{ bgcolor: platformColors[platformKey] || platformColors.default }}>
+                        {platformIcons[platformKey] || platformIcons.default}
                     </Avatar>
                 }
-                title={<Typography variant="h6" fontWeight={600} noWrap>{title}</Typography>}
-                subheader={<Typography variant="body2" color="text.secondary" noWrap>{company}</Typography>}
+                title={<Typography variant="h6" fontWeight={600} noWrap title={title}>{title}</Typography>}
+                subheader={<Typography variant="body2" color="text.secondary" noWrap title={company}>{company}</Typography>}
             />
-            {/* flexGrow: 1 allows this section to expand, pushing the button to the bottom */}
             <CardContent sx={{ flexGrow: 1, pt: 0 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                     {location || 'Remote'}
