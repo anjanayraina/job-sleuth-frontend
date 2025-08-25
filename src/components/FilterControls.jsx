@@ -1,61 +1,59 @@
 import React from 'react';
-import { Box, TextField, Paper, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, TextField, Paper, Typography, ToggleButton, ToggleButtonGroup, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-const FilterControls = ({ search, setSearch, platform, setPlatform, location, setLocation }) => {
+const FilterControls = ({ filters, setFilters }) => {
     const handlePlatformChange = (event, newPlatform) => {
-        // Ensures a button is always selected
         if (newPlatform !== null) {
-            setPlatform(newPlatform);
+            setFilters(prev => ({ ...prev, platform: newPlatform }));
         }
     };
 
     const handleLocationChange = (event, newLocation) => {
         if (newLocation !== null) {
-            setLocation(newLocation);
+            setFilters(prev => ({ ...prev, location: newLocation }));
         }
     };
 
+    const handleSearchChange = (event) => {
+        setFilters(prev => ({ ...prev, search: event.target.value }));
+    };
+
+    const clearFilters = () => {
+        setFilters({ search: '', platform: 'all', location: 'all' });
+    };
+
     return (
-        <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 4, borderRadius: 3 }}>
+        <Paper elevation={0} variant="outlined" sx={{ p: 2, position: 'sticky', top: '20px', borderRadius: 3 }}>
+            <Typography variant="h6" gutterBottom>Filters</Typography>
             <TextField
                 fullWidth
-                placeholder="Search by title, company, or keyword..."
+                placeholder="Search..."
                 variant="outlined"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                sx={{ mb: 2 }}
+                size="small"
+                value={filters.search}
+                onChange={handleSearchChange}
                 InputProps={{
                     startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} />,
                 }}
+                sx={{ mb: 2 }}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 'bold' }}>Platform</Typography>
-                    <ToggleButtonGroup
-                        value={platform}
-                        exclusive
-                        onChange={handlePlatformChange}
-                        aria-label="platform filter"
-                    >
-                        <ToggleButton value="all" aria-label="all platforms">All</ToggleButton>
-                        <ToggleButton value="telegram" aria-label="telegram">Telegram</ToggleButton>
-                        <ToggleButton value="discord" aria-label="discord">Discord</ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-                <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 'bold' }}>Location</Typography>
-                    <ToggleButtonGroup
-                        value={location}
-                        exclusive
-                        onChange={handleLocationChange}
-                        aria-label="location filter"
-                    >
-                        <ToggleButton value="all" aria-label="all locations">All</ToggleButton>
-                        <ToggleButton value="Remote" aria-label="remote">Remote</ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
+            <Box>
+                <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 'bold' }}>Platform</Typography>
+                <ToggleButtonGroup value={filters.platform} exclusive onChange={handlePlatformChange} aria-label="platform">
+                    <ToggleButton value="all">All</ToggleButton>
+                    <ToggleButton value="telegram">Telegram</ToggleButton>
+                    <ToggleButton value="discord">Discord</ToggleButton>
+                </ToggleButtonGroup>
             </Box>
+            <Box>
+                <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 'bold' }}>Location</Typography>
+                <ToggleButtonGroup value={filters.location} exclusive onChange={handleLocationChange} aria-label="location">
+                    <ToggleButton value="all">All</ToggleButton>
+                    <ToggleButton value="Remote">Remote</ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
+            <Button onClick={clearFilters} fullWidth sx={{ mt: 2 }}>Clear All</Button>
         </Paper>
     );
 };

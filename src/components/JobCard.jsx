@@ -5,7 +5,6 @@ import ChatIcon from "@mui/icons-material/Chat"; // Placeholder for Discord
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 export default function JobCard({ job, onView }) {
-    // This check prevents the crash if job is undefined.
     if (!job) {
         return null;
     }
@@ -33,14 +32,14 @@ export default function JobCard({ job, onView }) {
             onClick={onView}
             sx={{
                 borderRadius: 3,
-                height: '100%',
+                height: '100%', // This is crucial for making cards in the same row equal height
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'column', // Ensures content flows top-to-bottom
                 cursor: 'pointer',
                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                 '&:hover': {
-                    transform: 'translateY(-6px) scale(1.01)',
-                    boxShadow: (theme) => `0 20px 40px ${theme.palette.primary.main}25`,
+                    transform: 'translateY(-6px)',
+                    boxShadow: (theme) => `0 18px 36px ${theme.palette.primary.main}20`,
                 }
             }}
         >
@@ -53,6 +52,7 @@ export default function JobCard({ job, onView }) {
                 title={<Typography variant="h6" fontWeight={600} noWrap>{title}</Typography>}
                 subheader={<Typography variant="body2" color="text.secondary" noWrap>{company}</Typography>}
             />
+            {/* flexGrow: 1 allows this section to expand, pushing the button to the bottom */}
             <CardContent sx={{ flexGrow: 1, pt: 0 }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                     {location || 'Remote'}
