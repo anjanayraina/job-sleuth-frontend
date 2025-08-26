@@ -76,7 +76,7 @@ export default function JobList() {
 
     const handleJobsPerPageChange = (event) => {
         setJobsPerPage(parseInt(event.target.value, 10));
-        setPage(1); // Reset to the first page when changing items per page
+        setPage(1);
     };
 
     return (
