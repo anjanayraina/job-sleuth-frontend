@@ -1,10 +1,13 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage.jsx';
 import JobList from './features/jobs/JobList.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
-import LoginPage from './pages/LoginPage.jsx'; // Import Login page
-import SignUpPage from './pages/SignUpPage.jsx'; // Import SignUp page
+import LoginPage from './pages/LoginPage.jsx';
+import SignUpPage from './pages/SignUpPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx'; // <-- Import ProfilePage
+import UserSearchPage from './pages/UserSearchPage.jsx'; // <-- Import UserSearchPage
 
 function App() {
     return (
@@ -14,8 +17,10 @@ function App() {
                 <Route path="/jobs" element={<JobList />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/login" element={<LoginPage />} /> {/* Add Login route */}
-                <Route path="/signup" element={<SignUpPage />} /> {/* Add SignUp route */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/profile" element={<ProfilePage />} /> {/* <-- Add Profile Route */}
+                <Route path="/users/search" element={<UserSearchPage />} /> {/* <-- Add Search Route */}
             </Routes>
         </Router>
     );
