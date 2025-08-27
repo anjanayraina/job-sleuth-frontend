@@ -1,3 +1,5 @@
+// src/pages/LandingPage.jsx
+
 import React from "react";
 import { Link as RouterLink } from 'react-router-dom';
 import { Typography, Button, Container, Grid, Box, Paper } from "@mui/material";
@@ -44,27 +46,6 @@ const LandingPage = () => {
                         position: 'relative',
                         background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
                         boxShadow: (theme) => `0 20px 40px -10px ${theme.palette.primary.main}40`,
-                        '&::before, &::after': {
-                            content: '""',
-                            position: 'absolute',
-                            borderRadius: '50%',
-                            opacity: 0.15,
-                            filter: 'blur(30px)',
-                        },
-                        '&::before': {
-                            width: 200,
-                            height: 200,
-                            background: 'secondary.main',
-                            top: -50,
-                            left: -50,
-                        },
-                        '&::after': {
-                            width: 300,
-                            height: 300,
-                            background: 'primary.light',
-                            bottom: -100,
-                            right: -100,
-                        },
                     }}
                 >
                     <Box sx={{ position: 'relative', zIndex: 1 }}>
@@ -101,7 +82,8 @@ const LandingPage = () => {
                     <Grid container spacing={3}>
                         {latestJobs.length > 0 ? (
                             latestJobs.map((job) => (
-                                <Grid item key={job.job_hash} xs={12} sm={6} md={4}>
+                                // THE FIX IS HERE: Removed the "item" prop
+                                <Grid key={job.job_hash} xs={12} sm={6} md={4}>
                                     <JobCard job={job} onView={() => { /* Modal will handle this on the jobs page */ }} />
                                 </Grid>
                             ))

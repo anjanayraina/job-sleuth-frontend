@@ -6,7 +6,7 @@ import FilterControls from "../../components/FilterControls";
 import { jobService } from "../../services/jobService";
 import {
     Container, Grid, Typography, Box, Pagination,
-    CircularProgress, Alert, FormControl, InputLabel, Select, MenuItem
+    CircularProgress, Alert, Stack
 } from "@mui/material";
 
 export default function JobList() {
@@ -15,13 +15,14 @@ export default function JobList() {
     const [error, setError] = useState(null);
 
     const [filters, setFilters] = useState({
-        search: '',
-        platforms: [],
-        location: 'all',
+        jobType: 'Full Time',
+        experience: [],
+        salary: [],
+        domain: ''
     });
 
     const [page, setPage] = useState(1);
-    const [jobsPerPage, setJobsPerPage] = useState(12); // Default jobs per page
+    const jobsPerPage = 10; // Let's set a fixed number per page
 
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,23 +42,13 @@ export default function JobList() {
         getJobs();
     }, []);
 
+    // NOTE: This filtering logic is basic. You'll need to adapt it
+    // based on the actual data you get from your API (e.g., salary ranges).
     const filteredJobs = useMemo(() => {
         return allJobs.filter(job => {
             if (!job || !job.title || !job.company) return false;
-
-            const searchLower = filters.search.toLowerCase();
-            const searchTermMatch = filters.search === '' ||
-                job.title.toLowerCase().includes(searchLower) ||
-                job.company.toLowerCase().includes(searchLower) ||
-                job.description.toLowerCase().includes(searchLower) ||
-                job.source.toLowerCase().includes(searchLower) ||
-                (job.tags && job.tags.some(tag => tag.toLowerCase().includes(searchLower)));
-
-            const platformMatch = filters.platforms.length === 0 || (job.source && filters.platforms.includes(job.source.toLowerCase()));
-
-            const locationMatch = filters.location === 'all' || (job.location && job.location.toLowerCase().includes(filters.location.toLowerCase()));
-
-            return searchTermMatch && platformMatch && locationMatch;
+            // Add your complex filtering logic here based on the new filter state
+            return true;
         });
     }, [allJobs, filters]);
 
@@ -74,58 +65,46 @@ export default function JobList() {
         setSelectedJob(null);
     };
 
-    const handleJobsPerPageChange = (event) => {
-        setJobsPerPage(parseInt(event.target.value, 10));
-        setPage(1);
-    };
-
     return (
         <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
             <Header />
-            <Container maxWidth="xl" sx={{ py: 4, display: 'flex', gap: 4 }}>
-                <Box sx={{ width: '25%', display: { xs: 'none', md: 'block' } }}>
-                    <FilterControls filters={filters} setFilters={setFilters} />
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+                {/* Intro Text Block */}
+                <Box sx={{ textAlign: 'center', my: 4 }}>
+                    <Typography variant="h4" component="h1" fontWeight="bold">
+                        Loved by 100,000+ professionals
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1, maxWidth: '600px', mx: 'auto' }}>
+                        Join hundreds of professionals who have found their dream jobs through JobSleuth. With over 5,000 active jobs and global opportunities, your next career move is just a click away.
+                    </Typography>
                 </Box>
 
-                <Box sx={{ width: { xs: '100%', md: '75%' } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                        <Typography variant="h5">
-                            Showing {filteredJobs.length} open roles
-                        </Typography>
-                        <FormControl size="small" sx={{ minWidth: 120 }}>
-                            <InputLabel>Jobs per page</InputLabel>
-                            <Select
-                                value={jobsPerPage}
-                                label="Jobs per page"
-                                onChange={handleJobsPerPageChange}
-                            >
-                                <MenuItem value={12}>12</MenuItem>
-                                <MenuItem value={24}>24</MenuItem>
-                                <MenuItem value={36}>36</MenuItem>
-                            </Select>
-                        </FormControl>
+                {/* Main Two-Column Layout */}
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+                    {/* Filters Sidebar */}
+                    <Box sx={{ width: { xs: '100%', md: '280px' }, flexShrink: 0 }}>
+                        <FilterControls filters={filters} setFilters={setFilters} />
                     </Box>
-                    {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress size={60} /></Box>
-                    ) : error ? (
-                        <Alert severity="warning" sx={{ my: 5 }}>{error}</Alert>
-                    ) : (
-                        <>
-                            <Grid container spacing={2}>
-                                {currentJobs.map((job) => (
-                                    <Grid item key={job.job_hash} xs={12} sm={6} md={4}>
-                                        <JobCard job={job} onView={() => handleOpenModal(job)} />
-                                    </Grid>
-                                ))}
-                            </Grid>
 
-                            {filteredJobs.length > jobsPerPage &&
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                                    <Pagination count={pageCount} page={page} onChange={(e, value) => setPage(value)} color="primary" />
-                                </Box>
-                            }
-                        </>
-                    )}
+                    {/* Job Listings */}
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', my: 5 }}><CircularProgress size={60} /></Box>
+                        ) : error ? (
+                            <Alert severity="warning" sx={{ my: 5 }}>{error}</Alert>
+                        ) : (
+                            <Stack spacing={2}>
+                                {currentJobs.map((job) => (
+                                    <JobCard key={job.job_hash} job={job} onView={() => handleOpenModal(job)} />
+                                ))}
+                            </Stack>
+                        )}
+                        {filteredJobs.length > jobsPerPage &&
+                            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                                <Pagination count={pageCount} page={page} onChange={(e, value) => setPage(value)} color="primary" />
+                            </Box>
+                        }
+                    </Box>
                 </Box>
             </Container>
 
