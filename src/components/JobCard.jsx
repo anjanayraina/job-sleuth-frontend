@@ -8,19 +8,19 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave }) {
     if (!job) return null;
 
-    // --- FIX: Use job._id ---
-    const { title, company, tags, _id } = job;
+    // --- FIX: Use `id` which is sent from the backend ---
+    const { title, company, tags, id } = job;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
-        // --- FIX: Pass _id ---
-        onToggleLike(_id);
+        // --- FIX: Pass the correct `id` ---
+        onToggleLike(id);
     };
 
     const handleSaveClick = (e) => {
         e.stopPropagation();
-        // --- FIX: Pass _id ---
-        onToggleSave(_id);
+        // --- FIX: Pass the correct `id` ---
+        onToggleSave(id);
     };
 
     return (
@@ -33,7 +33,6 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
         >
             <Box component="img" sx={{ width: 80, height: 80, borderRadius: 1.5, objectFit: 'cover', flexShrink: 0 }}
                  src={`https://picsum.photos/seed/${company}/200`} alt={`${company} logo`} />
-
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="h6" fontWeight={600} noWrap title={title}>{title}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{company}</Typography>
@@ -41,7 +40,6 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                     {tags && tags.slice(0, 3).map(tag => <Chip key={tag} label={tag} size="small" variant="outlined" />)}
                 </Stack>
             </Box>
-
             <Stack direction="column">
                 <IconButton onClick={handleLikeClick} color="error">
                     {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}

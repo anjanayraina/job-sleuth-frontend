@@ -4,7 +4,7 @@ import { Box, Container, Typography, Paper, Tabs, Tab, CircularProgress, Alert, 
 import Header from '../components/Header';
 import JobCard from '../components/JobCard';
 import { userService } from '../services/userService';
-import { jobService } from '../services/jobService'; // We need this to get all jobs
+import { jobService } from '../services/jobService';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;

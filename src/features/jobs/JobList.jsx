@@ -6,21 +6,14 @@ import FilterControls from "../../components/FilterControls";
 import SearchBar from "../../components/SearchBar";
 import { jobService } from "../../services/jobService";
 import { userService } from "../../services/userService";
-import {
-    Container, Typography, Box, Pagination,
-    CircularProgress, Alert, Stack
-} from "@mui/material";
+import { Container, Typography, Box, Pagination, CircularProgress, Alert, Stack } from "@mui/material";
 
 export default function JobList() {
     const [allJobs, setAllJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
-
-    const [filters, setFilters] = useState({
-        keywords: '', location: '', jobType: [],
-        experience: 'any', salary: [], currency: 'lpa', domain: ''
-    });
+    const [filters, setFilters] = useState({ keywords: '', location: '', jobType: [], experience: 'any', salary: [], currency: 'lpa', domain: '' });
     const [page, setPage] = useState(1);
     const jobsPerPage = 10;
     const [selectedJob, setSelectedJob] = useState(null);
@@ -29,9 +22,11 @@ export default function JobList() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const jobsData = await jobService.getJobs();
+            const [jobsData, userData] = await Promise.all([
+                jobService.getJobs(),
+                userService.getMe().catch(() => null)
+            ]);
             setAllJobs(jobsData || []);
-            const userData = await userService.getMe();
             setCurrentUser(userData);
         } catch (err) {
             setError("Could not fetch jobs. Please try again later.");
@@ -40,14 +35,11 @@ export default function JobList() {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useEffect(() => { fetchData(); }, []);
 
     const handleToggleLike = async (jobId) => {
         if (!currentUser) return;
-        // --- FIX: Correctly check if the job ID exists in the user's list ---
-        const isLiked = currentUser.liked_jobs.some(job => job._id === jobId);
+        const isLiked = currentUser.liked_jobs.includes(jobId);
         try {
             isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId);
             const updatedUser = await userService.getMe();
@@ -57,8 +49,7 @@ export default function JobList() {
 
     const handleToggleSave = async (jobId) => {
         if (!currentUser) return;
-        // --- FIX: Correctly check if the job ID exists in the user's list ---
-        const isSaved = currentUser.saved_jobs.some(job => job._id === jobId);
+        const isSaved = currentUser.saved_jobs.includes(jobId);
         try {
             isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId);
             const updatedUser = await userService.getMe();
@@ -66,12 +57,11 @@ export default function JobList() {
         } catch (err) { console.error("Failed to update save status", err); }
     };
 
+    // ... (Filtering and other functions remain the same)
     const handleSearch = (searchTerms) => {
         setFilters(prev => ({ ...prev, keywords: searchTerms.keywords, location: searchTerms.location }));
     };
-    const filteredJobs = useMemo(() => {
-        return allJobs;
-    }, [allJobs, filters]);
+    const filteredJobs = useMemo(() => allJobs, [allJobs, filters]);
     const currentJobs = filteredJobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
     const pageCount = Math.ceil(filteredJobs.length / jobsPerPage);
     const handleOpenModal = (job) => { setSelectedJob(job); setIsModalOpen(true); };
@@ -93,14 +83,13 @@ export default function JobList() {
                                 : (
                                     <Stack spacing={2}>
                                         {currentJobs.map((job) => {
-                                            // --- FIX: Correctly check the liked/saved status for each card ---
-                                            const isLiked = currentUser?.liked_jobs.some(likedJob => likedJob._id === job._id) || false;
-                                            const isSaved = currentUser?.saved_jobs.some(savedJob => savedJob._id === job._id) || false;
-
+                                            // --- FIX: Use `job.id` for checking the lists ---
+                                            const isLiked = currentUser?.liked_jobs.includes(job.id) || false;
+                                            const isSaved = currentUser?.saved_jobs.includes(job.id) || false;
                                             return (
                                                 <JobCard
-                                                    // --- FIX: Use the correct unique key ---
-                                                    key={job._id}
+                                                    // --- FIX: Use `job.id` for the key ---
+                                                    key={job.id}
                                                     job={job}
                                                     onView={() => handleOpenModal(job)}
                                                     isLiked={isLiked}
