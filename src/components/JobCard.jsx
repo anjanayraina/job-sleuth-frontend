@@ -1,4 +1,3 @@
-// src/components/JobCard.jsx
 import React from "react";
 import { Card, Typography, Chip, Stack, Box, IconButton } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -9,16 +8,19 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave }) {
     if (!job) return null;
 
-    const { title, company, tags, id } = job;
+    // --- FIX: Use job._id ---
+    const { title, company, tags, _id } = job;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
-        onToggleLike(id); // Pass `id`
+        // --- FIX: Pass _id ---
+        onToggleLike(_id);
     };
 
     const handleSaveClick = (e) => {
         e.stopPropagation();
-        onToggleSave(id); // Pass `id`
+        // --- FIX: Pass _id ---
+        onToggleSave(_id);
     };
 
     return (
@@ -29,7 +31,6 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3 }
             }}
         >
-            {/* ... rest of the component remains the same ... */}
             <Box component="img" sx={{ width: 80, height: 80, borderRadius: 1.5, objectFit: 'cover', flexShrink: 0 }}
                  src={`https://picsum.photos/seed/${company}/200`} alt={`${company} logo`} />
 

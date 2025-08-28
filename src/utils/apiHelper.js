@@ -1,31 +1,21 @@
 import { API_BASE_URL } from '../config';
-import { authService } from '../services/authService'; // Import authService
+import { authService } from '../services/authService';
 
 const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
-    const token = authService.getToken(); // Get token from storage
+    const token = authService.getToken();
 
-    const defaultHeaders = {
-        'Accept': 'application/json',
-    };
+    const defaultHeaders = { 'Accept': 'application/json' };
 
-    // Only set Content-Type for JSON if the body is not form data
     if (!(options.body instanceof URLSearchParams)) {
         defaultHeaders['Content-Type'] = 'application/json';
     }
 
-    // If a token exists, add the Authorization header
     if (token) {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
-    const config = {
-        ...options,
-        headers: {
-            ...defaultHeaders,
-            ...options.headers,
-        },
-    };
+    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
 
     try {
         const response = await fetch(url, config);
@@ -58,4 +48,8 @@ export const apiHelper = {
             body: isFormData ? body : JSON.stringify(body)
         });
     },
+    // --- THIS IS THE FIX ---
+    delete: (endpoint) => {
+        return request(endpoint, { method: 'DELETE' });
+    }
 };

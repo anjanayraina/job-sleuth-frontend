@@ -1,4 +1,3 @@
-// src/features/jobs/JobList.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import Header from "../../components/Header";
 import JobCard from "../../components/JobCard";
@@ -18,7 +17,6 @@ export default function JobList() {
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // ... (filter and other state remains the same)
     const [filters, setFilters] = useState({
         keywords: '', location: '', jobType: [],
         experience: 'any', salary: [], currency: 'lpa', domain: ''
@@ -46,9 +44,10 @@ export default function JobList() {
         fetchData();
     }, []);
 
-    const handleToggleLike = async (jobId) => { // jobId is now the _id
+    const handleToggleLike = async (jobId) => {
         if (!currentUser) return;
-        const isLiked = currentUser.liked_jobs.some(j => j._id === jobId); // <-- Check _id
+        // --- FIX: Correctly check if the job ID exists in the user's list ---
+        const isLiked = currentUser.liked_jobs.some(job => job._id === jobId);
         try {
             isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId);
             const updatedUser = await userService.getMe();
@@ -56,9 +55,10 @@ export default function JobList() {
         } catch (err) { console.error("Failed to update like status", err); }
     };
 
-    const handleToggleSave = async (jobId) => { // jobId is now the _id
+    const handleToggleSave = async (jobId) => {
         if (!currentUser) return;
-        const isSaved = currentUser.saved_jobs.some(j => j._id === jobId); // <-- Check _id
+        // --- FIX: Correctly check if the job ID exists in the user's list ---
+        const isSaved = currentUser.saved_jobs.some(job => job._id === jobId);
         try {
             isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId);
             const updatedUser = await userService.getMe();
@@ -66,12 +66,10 @@ export default function JobList() {
         } catch (err) { console.error("Failed to update save status", err); }
     };
 
-    // ... (filtering and other logic is the same)
     const handleSearch = (searchTerms) => {
         setFilters(prev => ({ ...prev, keywords: searchTerms.keywords, location: searchTerms.location }));
     };
     const filteredJobs = useMemo(() => {
-        // ... filtering logic ...
         return allJobs;
     }, [allJobs, filters]);
     const currentJobs = filteredJobs.slice((page - 1) * jobsPerPage, page * jobsPerPage);
@@ -94,16 +92,15 @@ export default function JobList() {
                             : error ? <Alert severity="warning" sx={{ my: 5 }}>{error}</Alert>
                                 : (
                                     <Stack spacing={2}>
-                                        {
+                                        {currentJobs.map((job) => {
+                                            // --- FIX: Correctly check the liked/saved status for each card ---
+                                            const isLiked = currentUser?.liked_jobs.some(likedJob => likedJob._id === job._id) || false;
+                                            const isSaved = currentUser?.saved_jobs.some(savedJob => savedJob._id === job._id) || false;
 
-                                            currentJobs.map((job) => {
-
-                                            const isLiked = currentUser?.liked_jobs.includes(job.id) || false;
-                                            const isSaved = currentUser?.saved_jobs.includes(job.id) || false;
-                                            console.log("Job" , job);
                                             return (
                                                 <JobCard
-                                                    key={job.id}
+                                                    // --- FIX: Use the correct unique key ---
+                                                    key={job._id}
                                                     job={job}
                                                     onView={() => handleOpenModal(job)}
                                                     isLiked={isLiked}
