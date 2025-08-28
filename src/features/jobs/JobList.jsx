@@ -46,7 +46,6 @@ export default function JobList() {
         fetchData();
     }, []);
 
-    // --- UPDATED HANDLERS ---
     const handleToggleLike = async (jobId) => { // jobId is now the _id
         if (!currentUser) return;
         const isLiked = currentUser.liked_jobs.some(j => j._id === jobId); // <-- Check _id
@@ -95,12 +94,16 @@ export default function JobList() {
                             : error ? <Alert severity="warning" sx={{ my: 5 }}>{error}</Alert>
                                 : (
                                     <Stack spacing={2}>
-                                        {currentJobs.map((job) => {
-                                            const isLiked = currentUser?.liked_jobs.some(j => j._id === job._id) || false;
-                                            const isSaved = currentUser?.saved_jobs.some(j => j._id === job._id) || false;
+                                        {
+
+                                            currentJobs.map((job) => {
+
+                                            const isLiked = currentUser?.liked_jobs.includes(job.id) || false;
+                                            const isSaved = currentUser?.saved_jobs.includes(job.id) || false;
+                                            console.log("Job" , job);
                                             return (
                                                 <JobCard
-                                                    key={job._id} // <-- Use _id as key
+                                                    key={job.id}
                                                     job={job}
                                                     onView={() => handleOpenModal(job)}
                                                     isLiked={isLiked}

@@ -9,16 +9,16 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave }) {
     if (!job) return null;
 
-    const { title, company, tags, _id } = job; // <-- Use _id from the job object
+    const { title, company, tags, id } = job;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
-        onToggleLike(_id); // <-- Pass _id
+        onToggleLike(id); // Pass `id`
     };
 
     const handleSaveClick = (e) => {
         e.stopPropagation();
-        onToggleSave(_id); // <-- Pass _id
+        onToggleSave(id); // Pass `id`
     };
 
     return (
@@ -29,6 +29,7 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3 }
             }}
         >
+            {/* ... rest of the component remains the same ... */}
             <Box component="img" sx={{ width: 80, height: 80, borderRadius: 1.5, objectFit: 'cover', flexShrink: 0 }}
                  src={`https://picsum.photos/seed/${company}/200`} alt={`${company} logo`} />
 
