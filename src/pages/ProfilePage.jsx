@@ -17,26 +17,45 @@ function TabPanel(props) {
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
-    const [allJobs, setAllJobs] = useState([]);
+    // State to hold the FULL job objects
+    const [likedJobsList, setLikedJobsList] = useState([]);
+    const [savedJobsList, setSavedJobsList] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [tabValue, setTabValue] = useState(0);
 
-    // Fetch both user data and all jobs to display full job cards
+    // This is the new, more efficient data fetching logic
     const fetchData = async () => {
         try {
             setLoading(true);
             const userData = await userService.getMe();
-            const jobsData = await jobService.getJobs();
             setUser(userData);
-            setAllJobs(jobsData);
+
+            // Fetch liked and saved jobs only if there are any
+            if (userData.liked_jobs && userData.liked_jobs.length > 0) {
+                const likedJobsData = await jobService.getJobsByIds(userData.liked_jobs);
+                setLikedJobsList(likedJobsData);
+            } else {
+                setLikedJobsList([]);
+            }
+
+            if (userData.saved_jobs && userData.saved_jobs.length > 0) {
+                const savedJobsData = await jobService.getJobsByIds(userData.saved_jobs);
+                setSavedJobsList(savedJobsData);
+            } else {
+                setSavedJobsList([]);
+            }
+
         } catch (err) {
             setError('Could not fetch profile data. Please make sure you are logged in.');
+            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
+    // Re-fetch data whenever the component loads
     useEffect(() => {
         fetchData();
     }, []);
@@ -45,35 +64,29 @@ const ProfilePage = () => {
         setTabValue(newValue);
     };
 
-    // These handlers will update the state locally and then refetch for consistency
+    // These functions now re-trigger the efficient fetchData
     const handleToggleLike = async (jobId) => {
         const isLiked = user.liked_jobs.includes(jobId);
         try {
-            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId);
-            const updatedUser = await userService.getMe();
-            setUser(updatedUser); // Re-fetch user to update lists
+            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId, {});
+            fetchData(); // Re-fetch all data to update the UI
         } catch (err) { console.error("Failed to update like status", err); }
     };
 
     const handleToggleSave = async (jobId) => {
         const isSaved = user.saved_jobs.includes(jobId);
         try {
-            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId);
-            const updatedUser = await userService.getMe();
-            setUser(updatedUser); // Re-fetch user to update lists
+            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId, {});
+            fetchData(); // Re-fetch all data to update the UI
         } catch (err) { console.error("Failed to update save status", err); }
     };
-
-    // Filter all jobs to find ones that match the IDs in user's lists
-    const likedJobsList = allJobs.filter(job => user?.liked_jobs.includes(job.id));
-    const savedJobsList = allJobs.filter(job => user?.saved_jobs.includes(job.id));
 
     if (loading) {
         return <><Header /><Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box></>;
     }
 
-    if (error) {
-        return <><Header /><Container sx={{mt: 4}}><Alert severity="error">{error}</Alert></Container></>;
+    if (error || !user) {
+        return <><Header /><Container sx={{mt: 4}}><Alert severity="error">{error || 'User not found.'}</Alert></Container></>;
     }
 
     return (

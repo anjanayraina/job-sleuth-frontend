@@ -14,6 +14,11 @@ export const jobService = {
             return apiHelper.get('/api/jobs');
     },
 
+    getJobsByIds: (jobIds) => {
+        // This calls your new backend POST /api/jobs/by-ids endpoint.
+        return apiHelper.post('/api/jobs/by-ids', jobIds);
+    },
+
     /**
      * Searches for jobs using a detailed POST request.
      * @param {object} jobSearchRequest - The search criteria.

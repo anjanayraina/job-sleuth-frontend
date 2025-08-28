@@ -1,11 +1,11 @@
-import { API_BASE_URL } from '../config';
-import { authService } from '../services/authService';
+import {API_BASE_URL} from '../config';
+import {authService} from '../services/authService';
 
 const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = authService.getToken();
 
-    const defaultHeaders = { 'Accept': 'application/json' };
+    const defaultHeaders = {'Accept': 'application/json'};
 
     if (!(options.body instanceof URLSearchParams)) {
         defaultHeaders['Content-Type'] = 'application/json';
@@ -15,12 +15,12 @@ const request = async (endpoint, options = {}) => {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
-    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
+    const config = {...options, headers: {...defaultHeaders, ...options.headers}};
 
     try {
         const response = await fetch(url, config);
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            const errorData = await response.json().catch(() => ({message: response.statusText}));
             throw new Error(errorData.detail || errorData.message || 'An API error occurred');
         }
         return response.status === 204 ? null : response.json();
@@ -39,7 +39,7 @@ export const apiHelper = {
                 url += `?${new URLSearchParams(filteredParams)}`;
             }
         }
-        return request(url, { method: 'GET' });
+        return request(url, {method: 'GET'});
     },
     post: (endpoint, body) => {
         const isFormData = body instanceof URLSearchParams;
@@ -50,6 +50,11 @@ export const apiHelper = {
     },
     // --- THIS IS THE FIX ---
     delete: (endpoint) => {
-        return request(endpoint, { method: 'DELETE' });
-    }
+        return request(endpoint, {method: 'DELETE'});
+    },
+
+    getJobsByIds: (jobIds) => {
+        // This calls your new backend POST /api/jobs/by-ids endpoint.
+        return apiHelper.post('/api/jobs/by-ids', jobIds);
+    },
 };
