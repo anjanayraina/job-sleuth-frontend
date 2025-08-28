@@ -22,6 +22,7 @@ export default function Header() {
     return (
         <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'background.paper' }}>
             <Toolbar>
+                {/* ... (logo and left-side links) ... */}
                 <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
                     <Logo />
                     <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', ml: 1.5, display: { xs: 'none', sm: 'block' } }}>
@@ -35,9 +36,14 @@ export default function Header() {
                     <Button color="inherit" component={RouterLink} to="/about">About</Button>
                     <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
                 </Box>
+
                 <Box sx={{ ml: 2 }}>
                     {isLoggedIn ? (
-                        <Button variant="outlined" onClick={handleLogout}>Logout</Button>
+                        <>
+                            {/* --- THIS IS THE NEW BUTTON --- */}
+                            <Button component={RouterLink} to="/profile" sx={{ mr: 1 }}>My Profile</Button>
+                            <Button variant="outlined" onClick={handleLogout}>Logout</Button>
+                        </>
                     ) : (
                         <>
                             <Button component={RouterLink} to="/login" sx={{ mr: 1 }}>Login</Button>

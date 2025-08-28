@@ -6,8 +6,8 @@ import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SignUpPage from './pages/SignUpPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx'; // <-- Import ProfilePage
-import UserSearchPage from './pages/UserSearchPage.jsx'; // <-- Import UserSearchPage
+import ProfilePage from './pages/ProfilePage.jsx';
+import UserSearchPage from './pages/UserSearchPage.jsx';
 
 function App() {
     return (
@@ -19,8 +19,10 @@ function App() {
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
-                <Route path="/profile" element={<ProfilePage />} /> {/* <-- Add Profile Route */}
-                <Route path="/users/search" element={<UserSearchPage />} /> {/* <-- Add Search Route */}
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/users/search" element={<UserSearchPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+
             </Routes>
         </Router>
     );
