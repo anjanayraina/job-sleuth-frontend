@@ -1,3 +1,4 @@
+// src/features/jobs/JobList.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import Header from "../../components/Header";
 import JobCard from "../../components/JobCard";
@@ -37,11 +38,13 @@ export default function JobList() {
 
     useEffect(() => { fetchData(); }, []);
 
+    // FIX: Ensure the correct ID is passed to the service
     const handleToggleLike = async (jobId) => {
         if (!currentUser) return;
         const isLiked = currentUser.liked_jobs.includes(jobId);
         try {
-            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId);
+            // Pass an empty object {} for POST requests
+            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId, {});
             const updatedUser = await userService.getMe();
             setCurrentUser(updatedUser);
         } catch (err) { console.error("Failed to update like status", err); }
@@ -51,13 +54,13 @@ export default function JobList() {
         if (!currentUser) return;
         const isSaved = currentUser.saved_jobs.includes(jobId);
         try {
-            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId);
+            // Pass an empty object {} for POST requests
+            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId, {});
             const updatedUser = await userService.getMe();
             setCurrentUser(updatedUser);
         } catch (err) { console.error("Failed to update save status", err); }
     };
 
-    // ... (Filtering and other functions remain the same)
     const handleSearch = (searchTerms) => {
         setFilters(prev => ({ ...prev, keywords: searchTerms.keywords, location: searchTerms.location }));
     };
@@ -83,19 +86,20 @@ export default function JobList() {
                                 : (
                                     <Stack spacing={2}>
                                         {currentJobs.map((job) => {
-                                            // --- FIX: Use `job.id` for checking the lists ---
-                                            const isLiked = currentUser?.liked_jobs.includes(job.id) || false;
-                                            const isSaved = currentUser?.saved_jobs.includes(job.id) || false;
+                                            // --- FIX: Use `job._id` for checking the lists ---
+                                            const isLiked = currentUser?.liked_jobs.includes(job._id) || false;
+                                            const isSaved = currentUser?.saved_jobs.includes(job._id) || false;
                                             return (
                                                 <JobCard
-                                                    // --- FIX: Use `job.id` for the key ---
-                                                    key={job.id}
+                                                    // --- FIX: Use `job._id` for the key ---
+                                                    key={job._id}
                                                     job={job}
                                                     onView={() => handleOpenModal(job)}
                                                     isLiked={isLiked}
                                                     isSaved={isSaved}
-                                                    onToggleLike={handleToggleLike}
-                                                    onToggleSave={handleToggleSave}
+                                                    // --- FIX: Pass the correct job._id ---
+                                                    onToggleLike={() => handleToggleLike(job._id)}
+                                                    onToggleSave={() => handleToggleSave(job._id)}
                                                 />
                                             );
                                         })}
