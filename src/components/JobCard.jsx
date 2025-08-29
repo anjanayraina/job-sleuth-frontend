@@ -5,22 +5,21 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
-export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave }) {
+// The new 'showActions' prop defaults to true
+export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave, showActions = true }) {
     if (!job) return null;
 
-    // --- FIX: Use `id` which is sent from the backend ---
-    const { title, company, tags, id } = job;
+    // Use job._id for consistency across the app
+    const { title, company, tags, _id } = job;
 
     const handleLikeClick = (e) => {
-        e.stopPropagation();
-        // --- FIX: Pass the correct `id` ---
-        onToggleLike(id);
+        e.stopPropagation(); // Prevents the card's onView from firing
+        onToggleLike(_id);
     };
 
     const handleSaveClick = (e) => {
-        e.stopPropagation();
-        // --- FIX: Pass the correct `id` ---
-        onToggleSave(id);
+        e.stopPropagation(); // Prevents the card's onView from firing
+        onToggleSave(_id);
     };
 
     return (
@@ -40,14 +39,18 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                     {tags && tags.slice(0, 3).map(tag => <Chip key={tag} label={tag} size="small" variant="outlined" />)}
                 </Stack>
             </Box>
-            <Stack direction="column">
-                <IconButton onClick={handleLikeClick} color="error">
-                    {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                </IconButton>
-                <IconButton onClick={handleSaveClick} color="primary">
-                    {isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-                </IconButton>
-            </Stack>
+
+            {/* Action buttons are now rendered conditionally based on the showActions prop */}
+            {showActions && (
+                <Stack direction="column">
+                    <IconButton onClick={handleLikeClick} color="error">
+                        {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    </IconButton>
+                    <IconButton onClick={handleSaveClick} color="primary">
+                        {isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+                    </IconButton>
+                </Stack>
+            )}
         </Card>
     );
 }

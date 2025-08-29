@@ -1,40 +1,35 @@
-// src/pages/LandingPage.jsx
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link as RouterLink } from 'react-router-dom';
-import { Typography, Button, Container, Grid, Box, Paper } from "@mui/material";
+import { Typography, Button, Container, Grid, Box, CircularProgress } from "@mui/material";
 import Header from "../components/Header";
 import JobCard from "../components/JobCard";
 import { jobService } from "../services/jobService";
-import { useEffect, useState } from "react";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const LandingPage = () => {
-    const [latestJobs, setLatestJobs] = useState([]);
+    const [popularJobs, setPopularJobs] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchLatestJobs = async () => {
+        const fetchPopularJobs = async () => {
             try {
-                // Fetch all jobs and take the first 6
-                const allJobs = await jobService.getJobs();
-                setLatestJobs(allJobs.slice(0, 6));
+                setLoading(true);
+                const popularJobsData = await jobService.getMostLikedJobs();
+                setPopularJobs(popularJobsData);
             } catch (error) {
-                console.error("Failed to fetch latest jobs:", error);
+                console.error("Failed to fetch popular jobs:", error);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchLatestJobs();
+        fetchPopularJobs();
     }, []);
-
-    const handleViewJob = (url) => {
-        window.open(url, "_blank", "noopener,noreferrer");
-    };
 
     return (
         <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
             <Header />
 
             <Container maxWidth="lg" sx={{ py: 4 }}>
-                {/* --- New Hero Section --- */}
                 <Box
                     sx={{
                         textAlign: 'center',
@@ -62,41 +57,38 @@ const LandingPage = () => {
                             to="/jobs"
                             color="secondary"
                             endIcon={<ArrowForwardIcon />}
-                            sx={{
-                                py: 1.5,
-                                px: 4,
-                                borderRadius: '50px',
-                                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                            }}
+                            sx={{ py: 1.5, px: 4, borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}
                         >
                             Explore Open Roles
                         </Button>
                     </Box>
                 </Box>
 
-                {/* --- Latest Jobs Section --- */}
                 <Box sx={{ py: 6 }}>
                     <Typography variant="h4" component="h2" fontWeight="bold" gutterBottom sx={{ textAlign: 'center', mb: 4, color: 'text.primary' }}>
-                        Latest Opportunities
+                        Trending Opportunities
                     </Typography>
                     <Grid container spacing={3}>
-                        {latestJobs.length > 0 ? (
-                            latestJobs.map((job) => (
-                                // THE FIX IS HERE: Removed the "item" prop
-                                <Grid key={job.job_hash} xs={12} sm={6} md={4}>
-                                    <JobCard job={job} onView={() => { /* Modal will handle this on the jobs page */ }} />
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', mt: 4 }}>
+                                <CircularProgress />
+                            </Box>
+                        ) : popularJobs.length > 0 ? (
+                            popularJobs.map((job) => (
+                                <Grid item key={job._id} xs={12} sm={6} md={4}>
+                                    {/* Pass showActions={false} to hide the like/save buttons */}
+                                    <JobCard job={job} onView={() => {}} showActions={false} />
                                 </Grid>
                             ))
                         ) : (
                             <Typography sx={{ textAlign: 'center', width: '100%', mt: 4, color: 'text.secondary' }}>
-                                Loading latest jobs...
+                                No popular jobs found at the moment.
                             </Typography>
                         )}
                     </Grid>
                 </Box>
             </Container>
 
-            {/* A simple footer */}
             <Box component="footer" sx={{ py: 3, textAlign: 'center', color: 'text.secondary', mt: 'auto' }}>
                 <Typography variant="body2">
                     © 2025 JobSleuth. All rights reserved.

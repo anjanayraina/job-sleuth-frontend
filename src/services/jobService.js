@@ -19,6 +19,10 @@ export const jobService = {
         return apiHelper.post('/api/jobs/by-ids', jobIds);
     },
 
+    getMostLikedJobs: () => {
+        return apiHelper.get('/api/jobs/most-liked');
+    },
+
     /**
      * Searches for jobs using a detailed POST request.
      * @param {object} jobSearchRequest - The search criteria.

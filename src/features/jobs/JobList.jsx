@@ -30,6 +30,7 @@ export default function JobList() {
             setAllJobs(jobsData || []);
             setCurrentUser(userData);
         } catch (err) {
+            console.log(err);
             setError("Could not fetch jobs. Please try again later.");
         } finally {
             setLoading(false);
