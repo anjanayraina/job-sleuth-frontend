@@ -9,10 +9,9 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const token = authService.getToken();
-        setIsLoggedIn(!!token);
-    }, []);
 
+        setIsLoggedIn(authService.isLoggedIn());
+    }, []);
     const handleLogout = () => {
         authService.logout();
         setIsLoggedIn(false);

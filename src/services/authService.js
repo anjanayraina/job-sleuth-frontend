@@ -46,4 +46,29 @@ export const authService = {
     logout: () => {
         localStorage.removeItem('accessToken');
     },
+    isLoggedIn: () => {
+        const token = authService.getToken();
+        if (!token) {
+            return false;
+        }
+
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const decodedJson = atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/'));
+            const { exp } = JSON.parse(decodedJson);
+
+            const isExpired = Date.now() >= exp * 1000;
+
+            if (isExpired) {
+                authService.logout();
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.log(error);
+            authService.logout();
+            return false;
+        }
+    },
 };

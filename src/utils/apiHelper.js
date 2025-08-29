@@ -4,8 +4,7 @@ import {authService} from '../services/authService';
 const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = authService.getToken();
-
-    const defaultHeaders = {'Accept': 'application/json'};
+    const defaultHeaders = { 'Accept': 'application/json' };
 
     if (!(options.body instanceof URLSearchParams)) {
         defaultHeaders['Content-Type'] = 'application/json';
@@ -15,17 +14,27 @@ const request = async (endpoint, options = {}) => {
         defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
 
-    const config = {...options, headers: {...defaultHeaders, ...options.headers}};
+    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
 
     try {
         const response = await fetch(url, config);
+
+        // FIX: Change the reload logic to a redirect.
+        if (response.status === 401) {
+            authService.logout();
+            window.location.href = '/login';
+            throw new Error('Session expired. Redirecting to login.');
+        }
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({message: response.statusText}));
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
             throw new Error(errorData.detail || errorData.message || 'An API error occurred');
         }
         return response.status === 204 ? null : response.json();
     } catch (error) {
-        console.error('API Helper Error:', error);
+        if (error.message !== 'Session expired. Redirecting to login.') {
+            console.error('API Helper Error:', error);
+        }
         throw error;
     }
 };
@@ -54,7 +63,6 @@ export const apiHelper = {
     },
 
     getJobsByIds: (jobIds) => {
-        // This calls your new backend POST /api/jobs/by-ids endpoint.
         return apiHelper.post('/api/jobs/by-ids', jobIds);
     },
 };
