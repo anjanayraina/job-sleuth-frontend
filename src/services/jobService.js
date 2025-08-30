@@ -1,35 +1,22 @@
+// src/services/jobService.js
 import { apiHelper } from '../utils/apiHelper';
 
-/**
- * A service class for all job-related API calls.
- */
 export const jobService = {
     /**
-     * Fetches a list of jobs from the backend.
-     * @returns {Promise<Array>} A promise that resolves to an array of job objects.
+     * Searches for jobs using a detailed POST request with pagination.
+     * @param {object} searchRequest - The search criteria, including limit and skip.
+     * @returns {Promise<{total: number, jobs: Array}>} A promise that resolves to an object with jobs and total count.
      */
-    getJobs: () => {
-        // This calls your backend's GET /api/jobs endpoint.
-        // The apiHelper will automatically append the params to the URL.
-            return apiHelper.get('/api/jobs');
-    },
-
-    getJobsByIds: (jobIds) => {
-        // This calls your new backend POST /api/jobs/by-ids endpoint.
-        return apiHelper.post('/api/jobs/by-ids', jobIds);
+    searchJobs: (searchRequest) => {
+        // This calls your backend's POST /api/search_jobs endpoint.
+        return apiHelper.post('/api/search_jobs', searchRequest);
     },
 
     getMostLikedJobs: () => {
         return apiHelper.get('/api/jobs/most-liked');
     },
 
-    /**
-     * Searches for jobs using a detailed POST request.
-     * @param {object} jobSearchRequest - The search criteria.
-     * @returns {Promise<Array>} A promise that resolves to an array of job objects.
-     */
-    searchJobs: (jobSearchRequest) => {
-        // This calls your backend's POST /api/search_jobs endpoint.
-        return apiHelper.post('/search_jobs', jobSearchRequest);
-    }
+    getJobsByIds: (jobIds) => {
+        return apiHelper.post('/api/jobs/by-ids', jobIds);
+    },
 };

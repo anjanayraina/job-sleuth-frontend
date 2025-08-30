@@ -15,6 +15,7 @@ const LandingPage = () => {
             try {
                 setLoading(true);
                 const popularJobsData = await jobService.getMostLikedJobs();
+                console.log(popularJobsData);
                 setPopularJobs(popularJobsData);
             } catch (error) {
                 console.error("Failed to fetch popular jobs:", error);

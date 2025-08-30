@@ -1,24 +1,47 @@
+// src/components/JobCard.jsx
 import React from "react";
-import { Card, Typography, Chip, Stack, Box, IconButton } from "@mui/material";
+import { Card, Typography, Chip, Stack, Box, IconButton, Avatar } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
-// The new 'showActions' prop defaults to true
+// Helper to get a consistent color for each source
+const getSourceAvatarProps = (source) => {
+    const s = source?.toLowerCase() || 'default';
+    let color = '#757575'; // default grey
+    let char = s.charAt(0).toUpperCase();
+
+    if (s.includes('telegram')) { color = '#29b6f6'; char = 'T'; }
+    else if (s.includes('discord')) { color = '#7e57c2'; char = 'D'; }
+    else if (s.includes('linkedin')) { color = '#0277bd'; char = 'L'; }
+    else if (s.includes('remote')) { color = '#ff7043'; char = 'R'; }
+
+    return {
+        sx: {
+            bgcolor: color,
+            width: 80,
+            height: 80,
+            fontSize: '2.5rem',
+            borderRadius: 1.5,
+            flexShrink: 0
+        },
+        children: char,
+    };
+};
+
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave, showActions = true }) {
     if (!job) return null;
 
-    // Use job._id for consistency across the app
-    const { title, company, tags, _id } = job;
+    const { title, company, tags, _id, source } = job;
 
     const handleLikeClick = (e) => {
-        e.stopPropagation(); // Prevents the card's onView from firing
+        e.stopPropagation();
         onToggleLike(_id);
     };
 
     const handleSaveClick = (e) => {
-        e.stopPropagation(); // Prevents the card's onView from firing
+        e.stopPropagation();
         onToggleSave(_id);
     };
 
@@ -30,8 +53,9 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3 }
             }}
         >
-            <Box component="img" sx={{ width: 80, height: 80, borderRadius: 1.5, objectFit: 'cover', flexShrink: 0 }}
-                 src={`https://picsum.photos/seed/${company}/200`} alt={`${company} logo`} />
+            {/* --- DYNAMIC SOURCE AVATAR --- */}
+            <Avatar variant="rounded" {...getSourceAvatarProps(source)} />
+
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="h6" fontWeight={600} noWrap title={title}>{title}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{company}</Typography>
@@ -40,7 +64,6 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 </Stack>
             </Box>
 
-            {/* Action buttons are now rendered conditionally based on the showActions prop */}
             {showActions && (
                 <Stack direction="column">
                     <IconButton onClick={handleLikeClick} color="error">
