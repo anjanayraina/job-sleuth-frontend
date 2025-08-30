@@ -46,7 +46,7 @@ const SearchBar = ({ onSearch }) => {
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl fullWidth variant="outlined" sx={{ minWidth: 120 }}>
                         <InputLabel>Source</InputLabel>
                         <Select
                             name="source"
