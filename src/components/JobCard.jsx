@@ -5,28 +5,40 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LanguageIcon from '@mui/icons-material/Language';
+import ForumIcon from '@mui/icons-material/Forum';
 
-// Helper to get a consistent color for each source
 const getSourceAvatarProps = (source) => {
     const s = source?.toLowerCase() || 'default';
-    let color = '#757575'; // default grey
-    let char = s.charAt(0).toUpperCase();
+    let color = '#757575'; // A default grey color
+    let icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />; // Default to a "web" icon
 
-    if (s.includes('telegram')) { color = '#29b6f6'; char = 'T'; }
-    else if (s.includes('discord')) { color = '#7e57c2'; char = 'D'; }
-    else if (s.includes('linkedin')) { color = '#0277bd'; char = 'L'; }
-    else if (s.includes('remote')) { color = '#ff7043'; char = 'R'; }
+    if (s.includes('telegram')) {
+        color = '#29b6f6'; // Telegram's brand blue
+        icon = <TelegramIcon sx={{ fontSize: '2.5rem' }} />;
+    } else if (s.includes('discord')) {
+        color = '#7e57c2'; // Discord's "blurple" color
+        icon = <ForumIcon sx={{ fontSize: '2.5rem' }} />; // Using a forum/chat icon
+    } else if (s.includes('linkedin')) {
+        color = '#0277bd'; // LinkedIn's brand blue
+        icon = <LinkedInIcon sx={{ fontSize: '2.5rem' }} />;
+    } else if (s.includes('remote')) {
+        color = '#ff7043'; // A distinct orange for remote job boards
+        icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />;
+    }
 
     return {
         sx: {
             bgcolor: color,
             width: 80,
             height: 80,
-            fontSize: '2.5rem',
             borderRadius: 1.5,
-            flexShrink: 0
+            flexShrink: 0,
+            color: 'white', // Ensure the icon is white
         },
-        children: char,
+        children: icon,
     };
 };
 
@@ -53,7 +65,7 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3 }
             }}
         >
-            {/* --- DYNAMIC SOURCE AVATAR --- */}
+            {/* The Avatar now renders our new, beautiful icon */}
             <Avatar variant="rounded" {...getSourceAvatarProps(source)} />
 
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
@@ -77,3 +89,4 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
         </Card>
     );
 }
+
