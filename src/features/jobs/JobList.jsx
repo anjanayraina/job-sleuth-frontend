@@ -23,9 +23,7 @@ export default function JobList() {
         source: '',
         jobType: [],
         experience: 'any',
-        salary: [],
-        currency: 'lpa',
-        domain: ''
+        salary_type: 'any'
     });
 
     // State for pagination
@@ -42,22 +40,20 @@ export default function JobList() {
         setLoading(true);
         setError(null);
         try {
-            // Fetch user data in parallel
             const userPromise = userService.getMe().catch(() => null);
 
-            // Prepare search request for jobs from the unified filters state
             const searchRequest = {
                 general_query: filters.keywords,
                 location: filters.location,
                 source: filters.source,
                 job_type: filters.jobType.join(','),
-                // Add other filter fields here as your backend supports them
+                experience_level: filters.experience,
+                salary_type: filters.salary_type,
                 limit: jobsPerPage,
                 skip: (page - 1) * jobsPerPage,
             };
 
             const jobsPromise = jobService.searchJobs(searchRequest);
-
             const [userData, jobsResponse] = await Promise.all([userPromise, jobsPromise]);
 
             setCurrentUser(userData);
@@ -70,15 +66,14 @@ export default function JobList() {
         } finally {
             setLoading(false);
         }
-    }, [page, filters]); // Dependency array now includes the entire filters object
+    }, [page, filters]);
 
-    // Effect to fetch data when page or filters change
     useEffect(() => {
         fetchJobsAndUser();
     }, [fetchJobsAndUser]);
 
     const handleSearch = (searchTerms) => {
-        setPage(1); // Reset to first page on new search
+        setPage(1);
         setFilters(prev => ({
             ...prev,
             keywords: searchTerms.keywords,
@@ -95,9 +90,21 @@ export default function JobList() {
         if (!currentUser) return;
         const isLiked = currentUser.liked_jobs.includes(jobId);
         try {
-            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId, {});
+            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId);
+
+            // --- OPTIMISTIC UI UPDATE ---
             const updatedUser = await userService.getMe();
             setCurrentUser(updatedUser);
+
+            setJobs(prevJobs =>
+                prevJobs.map(job => {
+                    if (job._id === jobId) {
+                        return { ...job, like_count: isLiked ? job.like_count - 1 : job.like_count + 1 };
+                    }
+                    return job;
+                })
+            );
+            // --- END UPDATE ---
         } catch (err) { console.error("Failed to update like status", err); }
     };
 
@@ -105,7 +112,7 @@ export default function JobList() {
         if (!currentUser) return;
         const isSaved = currentUser.saved_jobs.includes(jobId);
         try {
-            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId, {});
+            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId);
             const updatedUser = await userService.getMe();
             setCurrentUser(updatedUser);
         } catch (err) { console.error("Failed to update save status", err); }
@@ -131,7 +138,7 @@ export default function JobList() {
                         ) : (
                             <>
                                 <Typography variant="h6" sx={{ mb: 2 }}>
-                                    Found {pageCount * jobsPerPage > 0 ? (page-1)*jobsPerPage+1 : 0}-{(page-1)*jobsPerPage + jobs.length} of {pageCount*jobsPerPage} jobs
+                                    Displaying {jobs.length > 0 ? ((page - 1) * jobsPerPage) + 1 : 0}-{(page - 1) * jobsPerPage + jobs.length} of {pageCount * jobsPerPage} jobs
                                 </Typography>
                                 <Stack spacing={2}>
                                     {jobs.length > 0 ? jobs.map((job) => {

@@ -10,6 +10,9 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LanguageIcon from '@mui/icons-material/Language';
 import ForumIcon from '@mui/icons-material/Forum';
 import RedditIcon from '@mui/icons-material/Reddit';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import SchoolIcon from '@mui/icons-material/School';
 
 const getSourceAvatarProps = (source) => {
     const s = source?.toLowerCase() || 'default';
@@ -47,10 +50,24 @@ const getSourceAvatarProps = (source) => {
     };
 };
 
+const InfoChip = ({ icon, label }) => (
+    <Chip
+        icon={icon}
+        label={label}
+        size="small"
+        variant="outlined"
+        sx={{
+            borderColor: 'divider',
+            color: 'text.secondary',
+            '& .MuiChip-icon': { color: 'text.secondary' }
+        }}
+    />
+);
+
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave, showActions = true }) {
     if (!job) return null;
 
-    const { title, company, tags, _id, source, like_count } = job;
+    const { title, company, tags, _id, source, like_count, salary, job_type, experience_level } = job;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
@@ -75,17 +92,25 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                 <Typography variant="h6" fontWeight={600} noWrap title={title}>{title}</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{company}</Typography>
+
+                {/* --- NEW DETAILS SECTION --- */}
+                <Stack direction="row" spacing={1} sx={{ mb: 1.5, flexWrap: 'wrap', gap: 0.5 }}>
+                    {job_type && job_type !== 'N/A' && <InfoChip icon={<WorkOutlineIcon />} label={job_type} />}
+                    {experience_level && experience_level !== 'N/A' && <InfoChip icon={<SchoolIcon />} label={experience_level} />}
+                    {salary && salary !== 'N/A' && <InfoChip icon={<AttachMoneyIcon />} label={salary} />}
+                </Stack>
+                {/* --- END NEW DETAILS --- */}
+
                 <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.5 }}>
                     {tags && tags.slice(0, 3).map(tag => <Chip key={tag} label={tag} size="small" variant="outlined" />)}
                 </Stack>
             </Box>
 
             {showActions && (
-                <Stack direction="column" alignItems="center">
+                <Stack direction="column" alignItems="center" sx={{ flexShrink: 0 }}>
                     <IconButton onClick={handleLikeClick} color="error">
                         {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton>
-                    {/* Display the like count */}
                     <Typography variant="caption" color="text.secondary">{like_count || 0}</Typography>
                     <IconButton onClick={handleSaveClick} color="primary" sx={{ mt: 1 }}>
                         {isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
