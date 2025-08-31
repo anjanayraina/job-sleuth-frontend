@@ -8,6 +8,9 @@ import LoginPage from './pages/LoginPage.jsx';
 import SignUpPage from './pages/SignUpPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import UserSearchPage from './pages/UserSearchPage.jsx';
+import BuyMeACoffeePage from './pages/BuyMeACoffeePage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 
 function App() {
     return (
@@ -22,7 +25,9 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/users/search" element={<UserSearchPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-
+                <Route path="/buy-me-a-coffee" element={<BuyMeACoffeePage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
             </Routes>
         </Router>
     );

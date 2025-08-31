@@ -76,7 +76,7 @@ const LandingPage = () => {
                             </Box>
                         ) : popularJobs.length > 0 ? (
                             popularJobs.map((job) => (
-                                <Grid item key={job._id} xs={12} sm={6} md={4}>
+                                <Grid item xs={12} sm={6} md={4} key={job._id}>
                                     {/* Pass showActions={false} to hide the like/save buttons */}
                                     <JobCard job={job} onView={() => {}} showActions={false} />
                                 </Grid>

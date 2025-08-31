@@ -24,6 +24,15 @@ export const authService = {
         return apiHelper.post('/api/auth/signup', { username, email, password });
     },
 
+    forgotPassword: (email) => {
+        return apiHelper.post('/api/auth/forgot-password', { email });
+    },
+
+    resetPassword: (data) => {
+        console.log(data);
+        return apiHelper.post('/api/auth/reset-password', data);
+    },
+
     /**
      * Stores the access token in localStorage.
      * @param {string} token The JWT access token.

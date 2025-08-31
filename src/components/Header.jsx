@@ -34,6 +34,7 @@ export default function Header() {
                     <Button color="inherit" component={RouterLink} to="/jobs">Browse Jobs</Button>
                     <Button color="inherit" component={RouterLink} to="/about">About</Button>
                     <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
+                    <Button color="inherit" component={RouterLink} to="/buy-me-a-coffee">Buy Me a Coffee</Button>
                 </Box>
 
                 <Box sx={{ ml: 2 }}>
