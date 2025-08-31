@@ -14,7 +14,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 
 function App() {
     return (
-        <Router>
+
+    <Router>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/jobs" element={<JobList />} />

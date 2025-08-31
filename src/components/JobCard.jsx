@@ -9,7 +9,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LanguageIcon from '@mui/icons-material/Language';
 import ForumIcon from '@mui/icons-material/Forum';
-import RedditIcon from '@mui/icons-material/Reddit'; // Import the Reddit icon
+import RedditIcon from '@mui/icons-material/Reddit';
 
 const getSourceAvatarProps = (source) => {
     const s = source?.toLowerCase() || 'default';
@@ -17,20 +17,20 @@ const getSourceAvatarProps = (source) => {
     let icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />; // Default to a "web" icon
 
     if (s.includes('telegram')) {
-        color = '#29b6f6'; // Telegram's brand blue
+        color = '#29b6f6';
         icon = <TelegramIcon sx={{ fontSize: '2.5rem' }} />;
     } else if (s.includes('discord')) {
-        color = '#7e57c2'; // Discord's "blurple" color
-        icon = <ForumIcon sx={{ fontSize: '2.5rem' }} />; // Using a forum/chat icon
+        color = '#7e57c2';
+        icon = <ForumIcon sx={{ fontSize: '2.5rem' }} />;
     } else if (s.includes('linkedin')) {
-        color = '#0277bd'; // LinkedIn's brand blue
+        color = '#0277bd';
         icon = <LinkedInIcon sx={{ fontSize: '2.5rem' }} />;
-    } else if (s.includes('remote')) {
-        color = '#ff7043'; // A distinct orange for remote job boards
-        icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />;
     } else if (s.includes('reddit')) {
-        color = '#FF4500'; // Reddit's brand orange-red
+        color = '#FF4500';
         icon = <RedditIcon sx={{ fontSize: '2.5rem' }} />;
+    } else if (s.includes('remote')) {
+        color = '#ff7043';
+        icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />;
     }
 
 
@@ -41,7 +41,7 @@ const getSourceAvatarProps = (source) => {
             height: 80,
             borderRadius: 1.5,
             flexShrink: 0,
-            color: 'white', // Ensure the icon is white
+            color: 'white',
         },
         children: icon,
     };
@@ -50,7 +50,7 @@ const getSourceAvatarProps = (source) => {
 export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, onToggleSave, showActions = true }) {
     if (!job) return null;
 
-    const { title, company, tags, _id, source } = job;
+    const { title, company, tags, _id, source, like_count } = job;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
@@ -70,7 +70,6 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
                 cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 3 }
             }}
         >
-            {/* The Avatar now renders our new, beautiful icon */}
             <Avatar variant="rounded" {...getSourceAvatarProps(source)} />
 
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
@@ -82,11 +81,13 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
             </Box>
 
             {showActions && (
-                <Stack direction="column">
+                <Stack direction="column" alignItems="center">
                     <IconButton onClick={handleLikeClick} color="error">
                         {isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                     </IconButton>
-                    <IconButton onClick={handleSaveClick} color="primary">
+                    {/* Display the like count */}
+                    <Typography variant="caption" color="text.secondary">{like_count || 0}</Typography>
+                    <IconButton onClick={handleSaveClick} color="primary" sx={{ mt: 1 }}>
                         {isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}
                     </IconButton>
                 </Stack>

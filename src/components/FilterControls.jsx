@@ -2,32 +2,32 @@
 import React from 'react';
 import {
     Box, Paper, Typography, Divider, FormGroup, FormControlLabel, Checkbox,
-    ToggleButtonGroup, ToggleButton, Button, FormControl, InputLabel, Select, MenuItem, RadioGroup, Radio
+    Button, FormControl, RadioGroup, Radio
 } from '@mui/material';
 
 const FilterControls = ({ filters, setFilters }) => {
 
-    const handleFilterChange = (group, exclusive = false) => (event, newValue) => {
+    const handleFilterChange = (group, exclusive = false) => (event) => {
         const value = event.target.value;
         setFilters(prev => {
             if (exclusive) {
-                return { ...prev, [group]: newValue !== null ? newValue : prev[group] };
+                return { ...prev, [group]: value };
             }
-            const newGroupValues = prev[group].includes(value)
-                ? prev[group].filter(item => item !== value)
-                : [...prev[group], value];
+            const currentValues = prev[group] || [];
+            const newGroupValues = currentValues.includes(value)
+                ? currentValues.filter(item => item !== value)
+                : [...currentValues, value];
             return { ...prev, [group]: newGroupValues };
         });
     };
 
     const clearFilters = () => {
-        setFilters({
+        setFilters(prev => ({
+            ...prev,
             jobType: [],
             experience: 'any',
-            salary: [],
-            currency: 'lpa',
-            domain: ''
-        });
+            salary_type: 'any',
+        }));
     };
 
     return (
@@ -42,10 +42,10 @@ const FilterControls = ({ filters, setFilters }) => {
             <Box sx={{ my: 2 }}>
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Job Type</Typography>
                 <FormGroup>
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('jobType')} value="Full Time" />} label="Full Time" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('jobType')} value="Part Time" />} label="Part Time" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('jobType')} value="Internship" />} label="Internship" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('jobType')} value="Freelance" />} label="Freelance" />
+                    <FormControlLabel control={<Checkbox checked={filters.jobType.includes('Full-time')} onChange={handleFilterChange('jobType')} value="Full-time" />} label="Full Time" />
+                    <FormControlLabel control={<Checkbox checked={filters.jobType.includes('Part-time')} onChange={handleFilterChange('jobType')} value="Part-time" />} label="Part Time" />
+                    <FormControlLabel control={<Checkbox checked={filters.jobType.includes('Contract')} onChange={handleFilterChange('jobType')} value="Contract" />} label="Contract" />
+                    <FormControlLabel control={<Checkbox checked={filters.jobType.includes('Internship')} onChange={handleFilterChange('jobType')} value="Internship" />} label="Internship" />
                 </FormGroup>
             </Box>
             <Divider />
@@ -55,58 +55,32 @@ const FilterControls = ({ filters, setFilters }) => {
                 <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Experience Level</Typography>
                 <FormControl>
                     <RadioGroup
-                        value={filters.experience}
-                        onChange={(e) => setFilters(prev => ({...prev, experience: e.target.value}))}
+                        value={filters.experience || 'any'}
+                        onChange={handleFilterChange('experience', true)}
                     >
                         <FormControlLabel value="any" control={<Radio />} label="Any" />
-                        <FormControlLabel value="entry" control={<Radio />} label="Entry-Level (0-2 yrs)" />
-                        <FormControlLabel value="mid" control={<Radio />} label="Mid-Level (3-5 yrs)" />
-                        <FormControlLabel value="senior" control={<Radio />} label="Senior (5+ yrs)" />
+                        <FormControlLabel value="Entry-Level" control={<Radio />} label="Entry-Level" />
+                        <FormControlLabel value="Mid-Level" control={<Radio />} label="Mid-Level" />
+                        <FormControlLabel value="Senior" control={<Radio />} label="Senior" />
                     </RadioGroup>
                 </FormControl>
             </Box>
             <Divider />
 
-            {/* Salary */}
+            {/* Salary Type */}
             <Box sx={{ my: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Salary</Typography>
-                    <ToggleButtonGroup
-                        value={filters.currency}
-                        exclusive
-                        size="small"
-                        onChange={(e, newCurrency) => setFilters(prev => ({ ...prev, currency: newCurrency || 'lpa' }))}
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Salary Type</Typography>
+                <FormControl>
+                    <RadioGroup
+                        value={filters.salary_type || 'any'}
+                        onChange={handleFilterChange('salary_type', true)}
                     >
-                        <ToggleButton value="lpa">₹ LPA</ToggleButton>
-                        <ToggleButton value="usd">$ USD</ToggleButton>
-                    </ToggleButtonGroup>
-                </Box>
-                <FormGroup>
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('salary')} value="0-50" />} label="< 50k" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('salary')} value="50-100" />} label="50k - 100k" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('salary')} value="100-200" />} label="100k - 200k" />
-                    <FormControlLabel control={<Checkbox onChange={handleFilterChange('salary')} value="200+" />} label="200k+" />
-                </FormGroup>
-            </Box>
-            <Divider />
-
-            {/* Domain */}
-            <Box sx={{ my: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Domain</Typography>
-                <FormControl fullWidth size="small">
-                    <InputLabel>Select Domain</InputLabel>
-                    <Select
-                        value={filters.domain}
-                        label="Select Domain"
-                        onChange={(e) => setFilters(prev => ({...prev, domain: e.target.value}))}
-                    >
-                        <MenuItem value=""><em>Any</em></MenuItem>
-                        <MenuItem value="engineering">Software Engineering</MenuItem>
-                        <MenuItem value="design">Design & UX</MenuItem>
-                        <MenuItem value="product">Product Management</MenuItem>
-                        <MenuItem value="data">Data Science</MenuItem>
-                        <MenuItem value="marketing">Marketing</MenuItem>
-                    </Select>
+                        <FormControlLabel value="any" control={<Radio />} label="Any" />
+                        <FormControlLabel value="yearly" control={<Radio />} label="Yearly" />
+                        <FormControlLabel value="monthly" control={<Radio />} label="Monthly" />
+                        <FormControlLabel value="hourly" control={<Radio />} label="Hourly" />
+                        <FormControlLabel value="project" control={<Radio />} label="Project-Based" />
+                    </RadioGroup>
                 </FormControl>
             </Box>
         </Paper>
