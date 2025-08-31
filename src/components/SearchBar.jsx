@@ -20,7 +20,7 @@ const SearchBar = ({ onSearch }) => {
     };
 
     // List of sources for the dropdown
-    const jobSources = ["telegram", "discord", "linkedin", "remoteok", "remotive", "weworkremotely", "cryptojobs"];
+    const jobSources = ["telegram", "discord", "linkedin", "remoteok", "remotive", "weworkremotely", "cryptojobs", "reddit"];
 
     return (
         <Paper sx={{ p: 2, mb: 4, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>

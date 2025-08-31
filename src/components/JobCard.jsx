@@ -9,6 +9,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LanguageIcon from '@mui/icons-material/Language';
 import ForumIcon from '@mui/icons-material/Forum';
+import RedditIcon from '@mui/icons-material/Reddit'; // Import the Reddit icon
 
 const getSourceAvatarProps = (source) => {
     const s = source?.toLowerCase() || 'default';
@@ -27,7 +28,11 @@ const getSourceAvatarProps = (source) => {
     } else if (s.includes('remote')) {
         color = '#ff7043'; // A distinct orange for remote job boards
         icon = <LanguageIcon sx={{ fontSize: '2.5rem' }} />;
+    } else if (s.includes('reddit')) {
+        color = '#FF4500'; // Reddit's brand orange-red
+        icon = <RedditIcon sx={{ fontSize: '2.5rem' }} />;
     }
+
 
     return {
         sx: {
@@ -89,4 +94,3 @@ export default function JobCard({ job, onView, isLiked, isSaved, onToggleLike, o
         </Card>
     );
 }
-

@@ -16,8 +16,17 @@ export default function JobList() {
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // State for search filters
-    const [searchFilters, setSearchFilters] = useState({ keywords: '', location: '', source: '' });
+    // Unified state for all filters
+    const [filters, setFilters] = useState({
+        keywords: '',
+        location: '',
+        source: '',
+        jobType: [],
+        experience: 'any',
+        salary: [],
+        currency: 'lpa',
+        domain: ''
+    });
 
     // State for pagination
     const [page, setPage] = useState(1);
@@ -36,11 +45,13 @@ export default function JobList() {
             // Fetch user data in parallel
             const userPromise = userService.getMe().catch(() => null);
 
-            // Prepare search request for jobs
+            // Prepare search request for jobs from the unified filters state
             const searchRequest = {
-                general_query: searchFilters.keywords,
-                location: searchFilters.location,
-                source: searchFilters.source,
+                general_query: filters.keywords,
+                location: filters.location,
+                source: filters.source,
+                job_type: filters.jobType.join(','),
+                // Add other filter fields here as your backend supports them
                 limit: jobsPerPage,
                 skip: (page - 1) * jobsPerPage,
             };
@@ -59,20 +70,21 @@ export default function JobList() {
         } finally {
             setLoading(false);
         }
-    }, [page, searchFilters]); // Dependency array for useCallback
+    }, [page, filters]); // Dependency array now includes the entire filters object
 
     // Effect to fetch data when page or filters change
     useEffect(() => {
         fetchJobsAndUser();
     }, [fetchJobsAndUser]);
 
-    const handleSearch = (newSearchTerms) => {
+    const handleSearch = (searchTerms) => {
         setPage(1); // Reset to first page on new search
-        setSearchFilters({
-            keywords: newSearchTerms.keywords,
-            location: newSearchTerms.location,
-            source: newSearchTerms.source,
-        });
+        setFilters(prev => ({
+            ...prev,
+            keywords: searchTerms.keywords,
+            location: searchTerms.location,
+            source: searchTerms.source,
+        }));
     };
 
     const handlePageChange = (event, value) => {
@@ -109,7 +121,7 @@ export default function JobList() {
                 <SearchBar onSearch={handleSearch} />
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <Box sx={{ width: { xs: '100%', md: '280px' }, flexShrink: 0 }}>
-                        <FilterControls filters={{}} setFilters={() => {}} />
+                        <FilterControls filters={filters} setFilters={setFilters} />
                     </Box>
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                         {loading ? (
