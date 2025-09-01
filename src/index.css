@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
   --primary: #3548f5;
   --primary-dark: #2b3db8;
@@ -10,7 +12,8 @@
 
 body {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background: var(--light);
+  background: linear-gradient(135deg, #F1F5F9 0%, #E0E7FF 100%);
+  background-attachment: fixed;
   margin: 0;
 }
 

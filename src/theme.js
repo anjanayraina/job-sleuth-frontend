@@ -1,48 +1,55 @@
 import { createTheme } from '@mui/material/styles';
 
-// Create a theme instance.
+// A clean, minimalist, and professional theme
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#1976D2',
-            light: '#64b5f6',
-            dark: '#1565c0',
+            main: '#1E293B', // Dark Slate
         },
         secondary: {
-            main: '#FFA726', // A vibrant orange for contrast
-            light: '#ffb74d',
-            dark: '#f57c00',
+            main: '#64748B', // Lighter Slate
         },
         background: {
-            default: '#f4f6f8', // A very light grey for the page background
-            paper: '#ffffff',   // White for cards and surfaces
+            default: '#F8FAFC', // Very light gray
+            paper: '#FFFFFF',
         },
         text: {
-            primary: '#212121', // Dark grey for primary text
-            secondary: '#757575', // Lighter grey for secondary text
-        }
+            primary: '#1E293B',
+            secondary: '#64748B',
+        },
+        divider: '#E2E8F0',
     },
     typography: {
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-        h1: {
-            fontWeight: 700,
-        },
-        h2: {
-            fontWeight: 700,
-        },
-        h3: {
-            fontWeight: 600,
-        },
-        h4: {
-            fontWeight: 600,
-        },
+        h4: { fontWeight: 700, color: '#1E293B' },
+        h5: { fontWeight: 600, color: '#334155' },
         button: {
-            textTransform: 'none', // Buttons will use normal case, not all-caps
-            fontWeight: 'bold',
-        }
+            textTransform: 'none',
+            fontWeight: 600,
+        },
     },
     shape: {
-        borderRadius: 8, // Slightly more rounded corners for components
+        borderRadius: 8,
+    },
+    components: {
+        MuiPaper: {
+            styleOverrides: {
+                root: {
+                    border: '1px solid #E2E8F0',
+                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+                },
+            },
+        },
+        MuiButton: {
+            styleOverrides: {
+                containedPrimary: {
+                    boxShadow: 'none',
+                    '&:hover': {
+                        boxShadow: 'none',
+                    },
+                },
+            },
+        },
     },
 });
 
