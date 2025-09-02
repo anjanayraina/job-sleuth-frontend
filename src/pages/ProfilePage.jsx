@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Paper, CircularProgress, Alert, Stack, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Grid, TextField, Button, Divider } from '@mui/material';
+import { Box, Container, Typography, Paper, Tabs, Tab, CircularProgress, Alert, Stack, Grid, Avatar } from '@mui/material';
 import Header from '../components/Header';
 import JobCard from '../components/JobCard';
 import JobDetailModal from '../components/JobDetailModal';
 import { userService } from '../services/userService';
 import { jobService } from '../services/jobService';
-import {AccountSettings} from '../components/AccountSettings';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-
+function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+    return (
+        <div role="tabpanel" hidden={value !== index} {...other}>
+            {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+        </div>
+    );
+}
 
 const ProfilePage = () => {
     const [user, setUser] = useState(null);
@@ -15,7 +24,7 @@ const ProfilePage = () => {
     const [savedJobsList, setSavedJobsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState(0);
+    const [tabValue, setTabValue] = useState(0);
 
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,14 +35,22 @@ const ProfilePage = () => {
             const userData = await userService.getMe();
             setUser(userData);
 
-            const [likedJobsData, savedJobsData] = await Promise.all([
-                userData.liked_jobs?.length > 0 ? jobService.getJobsByIds(userData.liked_jobs) : Promise.resolve([]),
-                userData.saved_jobs?.length > 0 ? jobService.getJobsByIds(userData.saved_jobs) : Promise.resolve([])
-            ]);
-            setLikedJobsList(likedJobsData);
-            setSavedJobsList(savedJobsData);
+            if (userData.liked_jobs?.length > 0) {
+                const likedJobsData = await jobService.getJobsByIds(userData.liked_jobs);
+                setLikedJobsList(likedJobsData);
+            } else {
+                setLikedJobsList([]);
+            }
+
+            if (userData.saved_jobs?.length > 0) {
+                const savedJobsData = await jobService.getJobsByIds(userData.saved_jobs);
+                setSavedJobsList(savedJobsData);
+            } else {
+                setSavedJobsList([]);
+            }
         } catch (err) {
             setError('Could not fetch profile data. Please make sure you are logged in.');
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -43,68 +60,129 @@ const ProfilePage = () => {
         fetchData();
     }, []);
 
-    const handleOpenModal = (job) => { setSelectedJob(job); setIsModalOpen(true); };
-    const handleCloseModal = () => { setIsModalOpen(false); setSelectedJob(null); };
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    };
+
+    const handleOpenModal = (job) => {
+        setSelectedJob(job);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedJob(null);
+    };
 
     const handleToggleLike = async (jobId) => {
+        const isLiked = user.liked_jobs.includes(jobId);
         try {
-            const isLiked = user.liked_jobs.includes(jobId);
-            await (isLiked ? userService.unlikeJob(jobId) : userService.likeJob(jobId));
+            isLiked ? await userService.unlikeJob(jobId) : await userService.likeJob(jobId, {});
             fetchData();
         } catch (err) { console.error("Failed to update like status", err); }
     };
 
     const handleToggleSave = async (jobId) => {
+        const isSaved = user.saved_jobs.includes(jobId);
         try {
-            const isSaved = user.saved_jobs.includes(jobId);
-            await (isSaved ? userService.unsaveJob(jobId) : userService.saveJob(jobId));
+            isSaved ? await userService.unsaveJob(jobId) : await userService.saveJob(jobId, {});
             fetchData();
         } catch (err) { console.error("Failed to update save status", err); }
     };
 
-    if (loading) return <><Header /><Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box></>;
-    if (error || !user) return <><Header /><Container sx={{ mt: 4 }}><Alert severity="error">{error || "User data could not be loaded."}</Alert></Container></>;
+    if (loading) {
+        return <><Header /><Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box></>;
+    }
 
-        return (
+    if (error || !user) {
+        return <><Header /><Container sx={{mt: 4}}><Alert severity="error">{error || "User data could not be loaded."}</Alert></Container></>;
+    }
+
+    return (
         <>
             <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
                 <Header />
                 <Container maxWidth="lg" sx={{ py: 4 }}>
-                    <Box sx={{ display: 'flex' }}>
-                        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-                        <Box component="main" sx={{ flexGrow: 1, pl: { sm: 3 } }}>
-                            <Paper sx={{ p: 4 }}>
-                                {activeTab === 0 && (
-                                    <>
-                                        <Typography variant="h5" gutterBottom>Liked Jobs</Typography>
-                                        <Stack spacing={2}>
-                                            {likedJobsList.length > 0 ? likedJobsList.map(job => (
-                                                <JobCard key={job._id} job={job} isLiked={true} isSaved={user.saved_jobs.includes(job._id)} onToggleLike={() => handleToggleLike(job._id)} onToggleSave={() => handleToggleSave(job._id)} onView={() => handleOpenModal(job)} />
-                                            )) : <Typography>You haven't liked any jobs yet.</Typography>}
-                                        </Stack>
-                                    </>
-                                )}
-                                {activeTab === 1 && (
-                                    <>
-                                        <Typography variant="h5" gutterBottom>Saved Jobs</Typography>
-                                        <Stack spacing={2}>
-                                            {savedJobsList.length > 0 ? savedJobsList.map(job => (
-                                                <JobCard key={job._id} job={job} isLiked={user.liked_jobs.includes(job._id)} isSaved={true} onToggleLike={() => handleToggleLike(job._id)} onToggleSave={() => handleToggleSave(job._id)} onView={() => handleOpenModal(job)} />
-                                            )) : <Typography>You haven't saved any jobs yet.</Typography>}
-                                        </Stack>
-                                    </>
-                                )}
-                                {activeTab === 2 && (
-                                    <AccountSettings user={user} />
-                                )}
-                            </Paper>
-                        </Box>
+                    {/* ... (Enriched User Info Section remains the same) ... */}
+                    <Box sx={{ mb: 4 }}>
+                        <Typography variant="h4" component="h1" fontWeight="bold">My Profile</Typography>
+                        <Typography variant="h6" color="text.secondary" gutterBottom>Welcome back, {user.username}!</Typography>
+                        <Grid container spacing={3} sx={{ mt: 2 }}>
+                            <Grid item xs={12} md={4}>
+                                <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Avatar sx={{ bgcolor: 'error.main' }}><FavoriteIcon /></Avatar>
+                                    <Box>
+                                        <Typography variant="h6" fontWeight="bold">{likedJobsList.length}</Typography>
+                                        <Typography color="text.secondary">Liked Jobs</Typography>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Avatar sx={{ bgcolor: 'primary.main' }}><BookmarkIcon /></Avatar>
+                                    <Box>
+                                        <Typography variant="h6" fontWeight="bold">{savedJobsList.length}</Typography>
+                                        <Typography color="text.secondary">Saved Jobs</Typography>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                            <Grid item xs={12} md={4}>
+                                <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Avatar sx={{ bgcolor: 'secondary.main' }}><AccountCircleIcon /></Avatar>
+                                    <Box>
+                                        <Typography variant="body1" fontWeight="bold">{user.email}</Typography>
+                                        <Typography color="text.secondary">Subscription: {user.subscription.toUpperCase()}</Typography>
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        </Grid>
                     </Box>
+
+
+                    <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 2 }}>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+                                <Tab label={`Liked Jobs`} />
+                                <Tab label={`Saved Jobs`} />
+                            </Tabs>
+                        </Box>
+
+                        <TabPanel value={tabValue} index={0}>
+                            <Stack spacing={2}>
+                                {likedJobsList.length > 0 ? likedJobsList.map(job => (
+                                    <JobCard
+                                        key={job._id}
+                                        job={job}
+                                        isLiked={true}
+                                        isSaved={user.saved_jobs.includes(job._id)}
+                                        onToggleLike={() => handleToggleLike(job._id)}
+                                        onToggleSave={() => handleToggleSave(job._id)}
+                                        onView={() => handleOpenModal(job)}
+                                    />
+                                )) : <Typography sx={{ textAlign: 'center', p: 4 }}>You haven't liked any jobs yet.</Typography>}
+                            </Stack>
+                        </TabPanel>
+                        <TabPanel value={tabValue} index={1}>
+                            <Stack spacing={2}>
+                                {savedJobsList.length > 0 ? savedJobsList.map(job => (
+                                    <JobCard
+                                        key={job._id}
+                                        job={job}
+                                        isLiked={user.liked_jobs.includes(job._id)}
+                                        isSaved={true}
+                                        onToggleLike={() => handleToggleLike(job._id)}
+                                        onToggleSave={() => handleToggleSave(job._id)}
+                                        onView={() => handleOpenModal(job)}
+                                    />
+                                )) : <Typography sx={{ textAlign: 'center', p: 4 }}>You haven't saved any jobs yet.</Typography>}
+                            </Stack>
+                        </TabPanel>
+                    </Paper>
                 </Container>
             </Box>
             <JobDetailModal job={selectedJob} open={isModalOpen} onClose={handleCloseModal} />
         </>
-        );
-        };
+    );
+};
 
-        export default ProfilePage;
+export default ProfilePage;
