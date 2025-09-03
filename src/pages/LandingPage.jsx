@@ -15,7 +15,6 @@ const LandingPage = () => {
             try {
                 setLoading(true);
                 const popularJobsData = await jobService.getMostLikedJobs();
-                console.log(popularJobsData);
                 setPopularJobs(popularJobsData);
             } catch (error) {
                 console.error("Failed to fetch popular jobs:", error);
@@ -29,17 +28,11 @@ const LandingPage = () => {
     return (
         <Box sx={{ backgroundColor: 'background.default', minHeight: '100vh' }}>
             <Header />
-
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <Box
                     sx={{
-                        textAlign: 'center',
-                        color: 'white',
-                        py: { xs: 10, md: 16 },
-                        my: 4,
-                        borderRadius: 4,
-                        overflow: 'hidden',
-                        position: 'relative',
+                        textAlign: 'center', color: 'white', py: { xs: 10, md: 16 },
+                        my: 4, borderRadius: 4, overflow: 'hidden', position: 'relative',
                         background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
                         boxShadow: (theme) => `0 20px 40px -10px ${theme.palette.primary.main}40`,
                     }}
@@ -52,12 +45,8 @@ const LandingPage = () => {
                             We scan Telegram, Discord, and niche job boards so you don't have to. Discover hidden opportunities before they go mainstream.
                         </Typography>
                         <Button
-                            variant="contained"
-                            size="large"
-                            component={RouterLink}
-                            to="/jobs"
-                            color="secondary"
-                            endIcon={<ArrowForwardIcon />}
+                            variant="contained" size="large" component={RouterLink} to="/jobs"
+                            color="secondary" endIcon={<ArrowForwardIcon />}
                             sx={{ py: 1.5, px: 4, borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}
                         >
                             Explore Open Roles
@@ -76,8 +65,8 @@ const LandingPage = () => {
                             </Box>
                         ) : popularJobs.length > 0 ? (
                             popularJobs.map((job) => (
+                                // --- FIX: Updated Grid syntax ---
                                 <Grid item xs={12} sm={6} md={4} key={job._id}>
-                                    {/* Pass showActions={false} to hide the like/save buttons */}
                                     <JobCard job={job} onView={() => {}} showActions={false} />
                                 </Grid>
                             ))
@@ -89,7 +78,6 @@ const LandingPage = () => {
                     </Grid>
                 </Box>
             </Container>
-
             <Box component="footer" sx={{ py: 3, textAlign: 'center', color: 'text.secondary', mt: 'auto' }}>
                 <Typography variant="body2">
                     © 2025 JobSleuth. All rights reserved.

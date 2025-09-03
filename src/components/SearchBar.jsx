@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { Paper, TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, disabled }) => {
     const [searchTerms, setSearchTerms] = useState({
         keywords: '',
         location: '',
-        source: '' // New state for the source filter
+        source: ''
     });
 
     const handleInputChange = (event) => {
@@ -19,7 +19,6 @@ const SearchBar = ({ onSearch }) => {
         onSearch(searchTerms);
     };
 
-    // List of sources for the dropdown
     const jobSources = ["telegram", "discord", "linkedin", "remoteok", "remotive", "weworkremotely", "cryptojobs", "reddit"];
 
     return (
@@ -33,6 +32,7 @@ const SearchBar = ({ onSearch }) => {
                         variant="outlined"
                         value={searchTerms.keywords}
                         onChange={handleInputChange}
+                        disabled={disabled}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -43,6 +43,7 @@ const SearchBar = ({ onSearch }) => {
                         variant="outlined"
                         value={searchTerms.location}
                         onChange={handleInputChange}
+                        disabled={disabled}
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -53,6 +54,7 @@ const SearchBar = ({ onSearch }) => {
                             value={searchTerms.source}
                             onChange={handleInputChange}
                             label="Source"
+                            disabled={disabled}
                         >
                             <MenuItem value=""><em>Any</em></MenuItem>
                             {jobSources.map(source => (
@@ -69,6 +71,7 @@ const SearchBar = ({ onSearch }) => {
                         startIcon={<SearchIcon />}
                         onClick={handleSearch}
                         sx={{ height: '56px' }}
+                        disabled={disabled}
                     >
                         Search
                     </Button>
