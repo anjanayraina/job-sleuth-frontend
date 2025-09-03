@@ -22,9 +22,8 @@ const LoginPage = () => {
             const response = await authService.login(email, password);
             if (response && response.access_token) {
                 authService.storeToken(response.access_token);
-                // Redirect to the homepage on successful login
                 navigate('/');
-                window.location.reload(); // Force a reload to update the header
+                // window.location.reload(); // FIX: This line has been removed
             } else {
                 setError("Login failed. Please check your credentials.");
             }

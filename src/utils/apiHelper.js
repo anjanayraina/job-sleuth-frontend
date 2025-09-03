@@ -19,8 +19,8 @@ const request = async (endpoint, options = {}) => {
     try {
         const response = await fetch(url, config);
 
-        // FIX: Change the reload logic to a redirect.
-        if (response.status === 401) {
+        // FIX: Only run this logic if the error is NOT from the login page itself.
+        if (response.status === 401 && endpoint !== '/api/auth/token') {
             authService.logout();
             window.location.href = '/login';
             throw new Error('Session expired. Redirecting to login.');
@@ -57,7 +57,6 @@ export const apiHelper = {
             body: isFormData ? body : JSON.stringify(body)
         });
     },
-    // --- THIS IS THE FIX ---
     delete: (endpoint) => {
         return request(endpoint, {method: 'DELETE'});
     },
