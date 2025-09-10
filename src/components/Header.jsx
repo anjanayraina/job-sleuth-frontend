@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Switch, FormControlLabel } from '@mui/material';
 import Logo from './Logo';
 import { authService } from '../services/authService';
+import { useThemeContext } from '../context/ThemeContext.jsx'; // Import the theme context hook
 
 export default function Header() {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { mode, toggleColorMode } = useThemeContext(); // Get theme mode and toggle function
 
     useEffect(() => {
-
         setIsLoggedIn(authService.isLoggedIn());
     }, []);
+
     const handleLogout = () => {
         authService.logout();
         setIsLoggedIn(false);
@@ -21,7 +23,6 @@ export default function Header() {
     return (
         <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'background.paper' }}>
             <Toolbar>
-                {/* ... (logo and left-side links) ... */}
                 <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
                     <Logo />
                     <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', ml: 1.5, display: { xs: 'none', sm: 'block' } }}>
@@ -29,18 +30,17 @@ export default function Header() {
                     </Typography>
                 </Box>
                 <Box sx={{ flexGrow: 1 }} />
-                <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-                    <Button color="inherit" component={RouterLink} to="/">Home</Button>
-                    <Button color="inherit" component={RouterLink} to="/jobs">Browse Jobs</Button>
-                    <Button color="inherit" component={RouterLink} to="/about">About</Button>
-                    <Button color="inherit" component={RouterLink} to="/contact">Contact</Button>
-                    <Button color="inherit" component={RouterLink} to="/buy-me-a-coffee">Buy Me a Coffee</Button>
-                </Box>
 
-                <Box sx={{ ml: 2 }}>
+                {/* --- THEME TOGGLE SWITCH --- */}
+                <FormControlLabel
+                    control={<Switch checked={mode === 'dark'} onChange={toggleColorMode} />}
+                    label={mode === 'dark' ? 'Dark' : 'Light'}
+                    sx={{mr: 2}}
+                />
+
+                <Box>
                     {isLoggedIn ? (
                         <>
-                            {/* --- THIS IS THE NEW BUTTON --- */}
                             <Button component={RouterLink} to="/profile" sx={{ mr: 1 }}>My Profile</Button>
                             <Button variant="outlined" onClick={handleLogout}>Logout</Button>
                         </>

@@ -1,8 +1,8 @@
 import { createTheme } from '@mui/material/styles';
 
-// A clean, minimalist, and professional theme
-const theme = createTheme({
+export const lightTheme = createTheme({
     palette: {
+        mode: 'light',
         primary: {
             main: '#1E293B', // Dark Slate
         },
@@ -17,12 +17,9 @@ const theme = createTheme({
             primary: '#1E293B',
             secondary: '#64748B',
         },
-        divider: '#E2E8F0',
     },
     typography: {
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-        h4: { fontWeight: 700, color: '#1E293B' },
-        h5: { fontWeight: 600, color: '#334155' },
         button: {
             textTransform: 'none',
             fontWeight: 600,
@@ -31,26 +28,34 @@ const theme = createTheme({
     shape: {
         borderRadius: 8,
     },
-    components: {
-        MuiPaper: {
-            styleOverrides: {
-                root: {
-                    border: '1px solid #E2E8F0',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
-                },
-            },
-        },
-        MuiButton: {
-            styleOverrides: {
-                containedPrimary: {
-                    boxShadow: 'none',
-                    '&:hover': {
-                        boxShadow: 'none',
-                    },
-                },
-            },
-        },
-    },
 });
 
-export default theme;
+export const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+            main: '#94A3B8', // Light Slate for dark mode
+        },
+        secondary: {
+            main: '#64748B', // Medium Slate
+        },
+        background: {
+            default: '#0F172A', // Very Dark Blue
+            paper: '#1E293B',   // Dark Slate
+        },
+        text: {
+            primary: '#F8FAFC',
+            secondary: '#94A3B8',
+        },
+    },
+    typography: {
+        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        button: {
+            textTransform: 'none',
+            fontWeight: 600,
+        },
+    },
+    shape: {
+        borderRadius: 8,
+    },
+});
